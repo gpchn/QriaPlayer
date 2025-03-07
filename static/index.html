@@ -1,131 +1,66 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
     <title>Paio - Player All In One</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
     <div class="container">
-        <!-- 左侧播放列表 -->
-        <div class="playlist-container">
-            <h2>Playlist</h2>
-            <ul id="playlist"></ul>
+      <!-- 左侧播放列表 -->
+      <div class="playlist-container">
+        <h2>播放列表</h2>
+        <input type="search" id="searchBox" placeholder="搜索歌曲..." />
+        <ul id="playlist"></ul>
+      </div>
+
+      <!-- 右侧播放控制 -->
+      <div class="player-container">
+        <!-- 歌词显示 -->
+        <div class="lyrics-container" id="lyricsBox"></div>
+
+        <!-- 歌曲信息 -->
+        <div class="song-info">
+          <h2 id="songTitle">- 请选取一首歌播放 -</h2>
+          <p id="songArtist"></p>
         </div>
 
-        <!-- 右侧播放控制 -->
-        <div class="player-container">
-            <!-- 封面显示 -->
-            <div class="cover-container">
-                <img id="coverImage" src="/static/default_cover.jpg" alt="Album Cover">
-            </div>
-
-            <!-- 歌词显示 -->
-            <div class="lyrics-container" id="lyricsBox"></div>
-
-            <!-- 歌曲信息 -->
-            <div class="song-info">
-                <h2 id="songTitle">- 请选取一首歌播放 -</h2>
-                <p id="songArtist"></p>
-            </div>
-
-            <!-- 进度条 -->
-            <div class="progress-container">
-                <input type="range" id="progressBar" value="0" class="progress">
-                <div class="time-display">
-                    <span id="currentTime">0:00</span>
-                    <span id="duration">0:00</span>
-                </div>
-            </div>
-
-            <!-- 控制按钮 -->
-            <div class="controls">
-                <button onclick="togglePlay()" id="playBtn">▶</button>
-                <button onclick="toggleMute()" id="muteBtn">🔊</button>
-                <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="1">
-            </div>
+        <!-- 进度条 -->
+        <div class="progress-container">
+          <input
+            type="range"
+            id="progressBar"
+            value="0"
+            class="progress"
+            min="0"
+            max="100"
+            step="0.1"
+          />
+          <div class="time-display">
+            <span id="currentTime">0:00</span>
+            <span id="duration">0:00</span>
+          </div>
         </div>
+
+        <!-- 控制按钮 -->
+        <div class="controls">
+          <button onclick="togglePlay()" id="playBtn">▶</button>
+          <button onclick="toggleLoopMode()" id="loopBtn">循环：关</button>
+          <div class="volume-container">
+            <button onclick="toggleMute()" id="muteBtn">🔊</button>
+            <input
+              type="range"
+              id="volumeSlider"
+              min="0"
+              max="1"
+              step="0.1"
+              value="1"
+            />
+          </div>
+        </div>
+      </div>
     </div>
 
-    <script>
-        const audio = new Audio();
-        let currentSong = null;
-        let lyricsData = [];
-
-        // 初始化加载播放列表
-        window.addEventListener('load', async () => {
-            await loadPlaylist();
-        });
-
-        // 加载播放列表
-        async function loadPlaylist() {
-            const res = await fetch('/api/music');
-            const { music_list } = await res.json();
-            
-            const playlist = document.getElementById('playlist');
-            playlist.innerHTML = music_list.map(song => `
-                <li onclick="loadSong('${song}')">
-                    ${song.replace('.mp3', '')}
-                </li>
-            `).join('');
-        }
-
-        // 加载歌曲
-        async function loadSong(filename) {
-            currentSong = filename;
-            
-            // 获取歌曲元数据
-            const res = await fetch(`/api/music/${filename}`);
-            const { title, artist, duration, cover_url } = await res.json();
-            
-            // 更新界面
-            document.getElementById('songTitle').textContent = title;
-            document.getElementById('songArtist').textContent = artist;
-            document.getElementById('coverImage').src = cover_url;
-
-            // 加载音频
-            audio.src = `/musics/${filename}`;
-            audio.play();
-
-            // 加载歌词
-            const lrcRes = await fetch(`/api/lyrics/${filename.replace('.mp3', '.lrc')}`);
-            const { lyrics } = await lrcRes.json();
-            lyricsData = lyrics;
-        }
-
-        // 播放/暂停控制
-        function togglePlay() {
-            audio.paused ? audio.play() : audio.pause();
-        }
-
-        // 静音控制
-        function toggleMute() {
-            audio.muted = !audio.muted;
-        }
-
-        // 进度条更新
-        audio.addEventListener('timeupdate', () => {
-            const progress = (audio.currentTime / audio.duration) * 100;
-            document.getElementById('progressBar').value = progress;
-            
-            // 时间显示
-            document.getElementById('currentTime').textContent = 
-                formatTime(audio.currentTime);
-            document.getElementById('duration').textContent = 
-                formatTime(audio.duration);
-        });
-
-        // 音量控制
-        document.getElementById('volumeSlider').addEventListener('input', (e) => {
-            audio.volume = e.target.value;
-        });
-
-        // 格式化时间显示
-        function formatTime(seconds) {
-            const mins = Math.floor(seconds / 60);
-            const secs = Math.floor(seconds % 60);
-            return `${mins}:${secs.toString().padStart(2, '0')}`;
-        }
-    </script>
-</body>
+    <script src="/static/main.js"></script>
+  </body>
 </html>

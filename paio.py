@@ -115,11 +115,6 @@ def ncm_lyric(id: int) -> str:
     return lrc
 
 
-# 网易云音乐封面解析
-def ncm_cover(id: int) -> bytes:
-    resq_cover = get()
-
-
 # QQ 音乐搜索
 def qq_search(name: str, num: int = 5) -> list:
     resq_search = get(QQ_SEARCH_API % (name, num))

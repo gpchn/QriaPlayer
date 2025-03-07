@@ -10,13 +10,14 @@ init()
 
 config_path = Path("config.toml")
 config = loads_toml(config_path.read_text())
-NCM_DLINK_API    = config.get("ncm").get("direct_link")
-NCM_SEARCH_API   = config.get("ncm").get("search")
-NCM_LYRIC_API    = config.get("ncm").get("lyric")
-QQ_DLINK_API     = config.get("qq").get("direct_link")
-QQ_SEARCH_API    = config.get("qq").get("search")
-KUGOU_DLINK_API  = config.get("kugou").get("direct_link")
+NCM_DLINK_API = config.get("ncm").get("direct_link")
+NCM_SEARCH_API = config.get("ncm").get("search")
+NCM_LYRIC_API = config.get("ncm").get("lyric")
+QQ_DLINK_API = config.get("qq").get("direct_link")
+QQ_SEARCH_API = config.get("qq").get("search")
+KUGOU_DLINK_API = config.get("kugou").get("direct_link")
 KUGOU_SEARCH_API = config.get("kugou").get("search")
+
 
 def main():
     while True:
@@ -55,16 +56,18 @@ def main():
         elif choosed_inedx <= 15:
             mp3_data = kugou_analyze(music_id)
         """
-        mp3_data   = ncm_analyze(music_id)
-        lrc_data   = ncm_lyric(music_id)
-            
+        mp3_data = ncm_analyze(music_id)
+        lrc_data = ncm_lyric(music_id)
+
         # 创建文件的 Path 对象
         music_name = f"{choosed_song[1]} - {choosed_song[2]}"
-        save_path  = Path(f"./musics/{music_name}.mp3")
-        lrc_path   = Path(f"./lyrics/{music_name}.lrc")
+        save_path = Path(f"./musics/{music_name}.mp3")
+        lrc_path = Path(f"./lyrics/{music_name}.lrc")
         # 检查文件是否已经存在，如存在，则删除
-        if save_path.exists():  save_path.unlink()
-        if lrc_path.exists():   lrc_path.unlink()
+        if save_path.exists():
+            save_path.unlink()
+        if lrc_path.exists():
+            lrc_path.unlink()
 
         print(f"(4/4) 保存歌曲到 {save_path}")
         # 写入数据
@@ -83,7 +86,7 @@ def ncm_search(name: str, num: int = 10) -> list:
     # 获取每首音乐的信息
     search_result = loads_json(resq_search.text).get("result").get("songs")
     songs = []
-    
+
     # 遍历每一首歌，获取 id、名字、歌手信息
     for index, song in enumerate(search_result, 1):
         song_id = song.get("id")
@@ -95,7 +98,7 @@ def ncm_search(name: str, num: int = 10) -> list:
         print(f"[{index}] {Fore.RED}{song_name} - {song_artist}{Fore.RESET}")
 
     return songs
-    
+
 
 # 网易云音乐直链解析
 def ncm_analyze(id: int) -> bytes:
@@ -111,7 +114,7 @@ def ncm_analyze(id: int) -> bytes:
 def ncm_lyric(id: int) -> str:
     resq_lrc = get(NCM_LYRIC_API % id)
     lrc = loads_json(resq_lrc.text).get("lrc").get("lyric")
-    
+
     return lrc
 
 
@@ -146,15 +149,7 @@ def qq_analyze(id: int) -> bytes:
     return resq_mp3.content
 
 
-def kugou_search():
-    ...
+def kugou_search(): ...
 
 
-def kugou_analyze():
-    ...
-
-
-if __name__ == "__main__":
-    main()
-
-
+def kugou_analyze(): ...

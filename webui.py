@@ -5,6 +5,9 @@ from pathlib import Path
 from mutagen.mp3 import MP3
 from mutagen.id3 import ID3
 from uvicorn import run as uvicorn_run
+from colorama import init
+
+init()
 
 app = FastAPI()
 
@@ -23,7 +26,9 @@ async def get_music_list():
     # 读取音乐文件列表
     try:
         music_dir = Path("musics")
-        music_files = [f.name for f in music_dir.iterdir() if f.suffix.lower() == ".mp3"]
+        music_files = [
+            f.name for f in music_dir.iterdir() if f.suffix.lower() == ".mp3"
+        ]
         return JSONResponse(content={"music_list": music_files})
     except Exception as e:
         return JSONResponse(
@@ -63,6 +68,7 @@ def get_id3_tag(audio, tag, default):
     return default if isinstance(default, str) else str(Path(audio.filename).stem)
 
 
+# ! 运行时会 500，待解决
 @app.get("/api/lyrics/{filename}")
 async def get_lyrics(filename: str):
     # 读取歌词文件
@@ -80,3 +86,7 @@ async def get_lyrics(filename: str):
 
 if __name__ == "__main__":
     uvicorn_run(app, host="localhost", port=41004)
+
+# todo: 修复歌曲名称显示 bug
+# todo：修复歌词显示偏移 bug
+# todo：将 paio.py 基于命令行的交互挪到网页上

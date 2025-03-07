@@ -25,18 +25,20 @@ body {
 }
 
 /* 自定义滚动条 */
-.playlist-container::-webkit-scrollbar {
+.playlist-container::-webkit-scrollbar,
+.lyrics-container::-webkit-scrollbar {
   width: 8px;
   background: #252525;
 }
 
-.playlist-container::-webkit-scrollbar-thumb {
+.playlist-container::-webkit-scrollbar-thumb,
+.lyrics-container::-webkit-scrollbar-thumb {
   background: #1db954;
   border-radius: 4px;
 }
 
 #searchBox {
-  width: calc(100% - 24px);
+  width: 100%; /* 修改为100%宽度 */
   padding: 12px;
   margin: 10px 0;
   background: #383838;
@@ -146,6 +148,7 @@ body {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 50px;
   margin-top: auto;
+  justify-content: center; /* 居中对齐 */
 }
 
 button {

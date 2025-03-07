@@ -90,18 +90,17 @@ async function loadSong(filename) {
   }
 }
 
-// 修改后的 parseLyrics 函数
 function parseLyrics(lyrics) {
   return lyrics
     .split("\n")
     .map((line) => {
-      const match = line.match(/^\[(\d+):(\d+)\.(\d+)\](.*)/); // 修正正则表达式
+      const match = line.match(/^\[(\d+):(\d+)\.(\d+)\](.*)/);
       if (match) {
         const minutes = parseFloat(match[1]);
         const seconds = parseFloat(match[2]);
         return {
           time: minutes * 60 + seconds,
-          text: match[4].trim(), // 修正文本位置
+          text: match[4].trim(),
         };
       }
       return null;
@@ -159,7 +158,12 @@ function handlePlayEnd() {
   if (loopMode === "single") {
     audio.play();
   } else if (loopMode === "all") {
-    // 播放下一首逻辑
+    const playlist = JSON.parse(
+      document.getElementById("playlist").dataset.originalList
+    );
+    const currentIndex = playlist.indexOf(currentSong);
+    const nextIndex = (currentIndex + 1) % playlist.length;
+    loadSong(playlist[nextIndex]);
   }
 }
 

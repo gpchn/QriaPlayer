@@ -2,10 +2,9 @@
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 from pathlib import Path
-import os
-import uvicorn
 from mutagen.mp3 import MP3
 from mutagen.id3 import ID3
+from uvicorn import run as uvicorn_run
 
 app = FastAPI()
 
@@ -21,8 +20,10 @@ async def index():
 
 @app.get("/api/music")
 async def get_music_list():
+    # 读取音乐文件列表
     try:
-        music_files = [f for f in os.listdir("musics") if f.lower().endswith(".mp3")]
+        music_dir = Path("musics")
+        music_files = [f.name for f in music_dir.iterdir() if f.suffix.lower() == ".mp3"]
         return JSONResponse(content={"music_list": music_files})
     except Exception as e:
         return JSONResponse(
@@ -32,10 +33,12 @@ async def get_music_list():
 
 @app.get("/api/music/{filename}")
 async def get_music_info(filename: str):
+    # 检查音乐文件是否存在
     filepath = Path("musics") / filename
     if not filepath.exists():
         raise HTTPException(status_code=404, detail="音乐文件未找到")
 
+    # 解析音乐文件
     try:
         audio = MP3(filepath, ID3=ID3)
         filename_parts = Path(filename).stem.split(" - ", 1)
@@ -54,6 +57,7 @@ async def get_music_info(filename: str):
 
 
 def get_id3_tag(audio, tag, default):
+    # 如果标签存在，则返回标签值，否则返回默认值
     if audio.tags and tag in audio.tags:
         return str(audio.tags[tag])
     return default if isinstance(default, str) else str(Path(audio.filename).stem)
@@ -61,10 +65,12 @@ def get_id3_tag(audio, tag, default):
 
 @app.get("/api/lyrics/{filename}")
 async def get_lyrics(filename: str):
+    # 读取歌词文件
     lrc_path = Path("lyrics") / filename
     if not lrc_path.exists():
         raise HTTPException(status_code=404, detail="歌词文件未找到")
 
+    # 返回歌词内容
     try:
         with open(lrc_path, "r", encoding="utf-8") as f:
             return JSONResponse(content={"lyrics": f.read()})
@@ -73,4 +79,4 @@ async def get_lyrics(filename: str):
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="localhost", port=41004)
+    uvicorn_run(app, host="localhost", port=41004)

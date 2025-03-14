@@ -183,9 +183,9 @@ def configure_logging():
 def start_server():
     from uvicorn import run
     try:
-        from tomllib import loads
+        from tomllib import loads # type: ignore
     except ModuleNotFoundError:
-        from toml import loads
+        from toml import loads # type: ignore
 
     # 读取配置文件
     cfg_path = Path("config.toml")

@@ -10,6 +10,17 @@ from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 
+try:
+    from tomllib import loads  # type: ignore
+except ModuleNotFoundError:
+    from toml import loads  # type: ignore
+
+# 读取配置文件
+cfg_path = Path("config.toml")
+cfg = loads(cfg_path.read_text())
+HOST = cfg.get("server").get("host")
+PORT = cfg.get("server").get("port")
+
 init()
 
 app = FastAPI()
@@ -92,6 +103,7 @@ class SysTray:
         image = Image.open("paio.ico")
 
         menu = (
+            MenuItem("打开页面", self._open_in_browser),
             MenuItem("查看日志", self._open_log),
             MenuItem("重启", self._restart),  # 新增重启选项
             MenuItem("退出", self._on_exit),
@@ -119,17 +131,23 @@ class SysTray:
         """重启程序"""
         from os import execl
         from sys import argv, executable
-        
+
         self.icon.stop()
         python = executable
         execl(python, python, *argv)
-        
+
     def _get_latest_log(self):
         """获取最新的日志文件"""
         log_files = list(self.log_dir.glob("*.log"))
         if log_files:
             return max(log_files, key=lambda x: x.stat().st_birthtime)
         return None
+
+    def _open_in_browser(self, *args):
+        """打开浏览器"""
+        from webbrowser import open
+
+        open(f"http://{HOST}:{PORT}")
 
     def run(self):
         """在独立线程运行托盘图标"""
@@ -182,16 +200,6 @@ def configure_logging():
 
 def start_server():
     from uvicorn import run
-    try:
-        from tomllib import loads # type: ignore
-    except ModuleNotFoundError:
-        from toml import loads # type: ignore
-
-    # 读取配置文件
-    cfg_path = Path("config.toml")
-    cfg = loads(cfg_path.read_text())
-    host = cfg.get("server").get("host")
-    port = cfg.get("server").get("port")
 
     # 配置日志
     log_config, log_dir = configure_logging()
@@ -203,8 +211,8 @@ def start_server():
     # 启动FastAPI服务
     run(
         app=app,
-        host=host,
-        port=port,
+        host=HOST,
+        port=PORT,
         log_config=log_config,
         # 以下参数防止uvicorn占用主线程
         reload=False,

@@ -143,10 +143,10 @@ body {
 .controls {
   display: flex;
   align-items: center;
-  gap: 25px;
-  padding: 15px;
+  gap: 20px;
+  padding: 10px;
   background: rgba(255, 255, 255, 0.05);
-  border-radius: 50px;
+  border-radius: 30px;
   margin-top: auto;
   justify-content: center; /* 居中对齐 */
 }

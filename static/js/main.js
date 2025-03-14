@@ -115,10 +115,18 @@ function updateLyrics(currentTime) {
     return;
   }
 
+  // 确保歌词数据按时间升序排列
+  lyricsData.sort((a, b) => a.time - b.time);
+
   let activeIndex = -1;
-  lyricsData.forEach((line, index) => {
-    if (currentTime >= line.time) activeIndex = index;
-  });
+  // 找到第一个超过当前时间的行，然后取前一索引
+  for (let i = 0; i < lyricsData.length; i++) {
+    if (currentTime >= lyricsData[i].time) {
+      activeIndex = i;
+    } else {
+      break; // 后续行时间更大，无需继续遍历
+    }
+  }
 
   lyricsBox.innerHTML = lyricsData
     .map(
@@ -129,11 +137,19 @@ function updateLyrics(currentTime) {
     )
     .join("");
 
-  if (activeIndex > 3) {
-    lyricsBox.children[activeIndex - 3]?.scrollIntoView({
-      behavior: "smooth",
-      block: "center",
-    });
+  // 滚动居中逻辑
+  if (activeIndex !== -1) {
+    const activeLine = lyricsBox.children[activeIndex];
+    if (activeLine) {
+      const containerHeight = lyricsBox.clientHeight;
+      const lineTop = activeLine.offsetTop;
+      const lineHeight = activeLine.offsetHeight;
+      const scrollTop = lineTop - (containerHeight - lineHeight) / 2;
+      lyricsBox.scrollTo({
+        top: scrollTop,
+        behavior: "smooth",
+      });
+    }
   }
 }
 

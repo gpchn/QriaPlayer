@@ -2,8 +2,6 @@
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 from pathlib import Path
-from mutagen.mp3 import MP3
-from mutagen.id3 import ID3
 from uvicorn import run as uvicorn_run
 from colorama import init
 
@@ -19,6 +17,11 @@ app.mount("/musics", StaticFiles(directory="musics"), name="musics")
 @app.get("/", response_class=FileResponse)
 async def index():
     return FileResponse("static/index.html")
+
+
+@app.get("/favicon.ico")
+def favicon():
+    return FileResponse("static/favicon.ico")
 
 
 @app.get("/api/music")
@@ -44,31 +47,16 @@ async def get_music_info(filename: str):
         raise HTTPException(status_code=404, detail="音乐文件未找到")
 
     # 解析音乐文件
-    try:
-        audio = MP3(filepath, ID3=ID3)
-        filename_parts = Path(filename).stem.split(" - ", 1)
-        default_title = filename_parts[0]
-        default_artist = filename_parts[1] if len(filename_parts) > 1 else "未知艺术家"
+    filename_parts = Path(filename).stem.split(" - ", 1)
+    title = filename_parts[0]
+    artist = filename_parts[1] if len(filename_parts) > 1 else "未知艺术家"
 
-        return {
-            "title": get_id3_tag(audio, "TIT2", default_title),
-            "artist": get_id3_tag(audio, "TPE1", default_artist),
-            "duration": audio.info.length,
-        }
-    except Exception as e:
-        return JSONResponse(
-            status_code=500, content={"error": f"解析音乐文件失败: {str(e)}"}
-        )
+    return {
+        "title": title,
+        "artist": artist,
+    }
 
 
-def get_id3_tag(audio, tag, default):
-    # 如果标签存在，则返回标签值，否则返回默认值
-    if audio.tags and tag in audio.tags:
-        return str(audio.tags[tag])
-    return default if isinstance(default, str) else str(Path(audio.filename).stem)
-
-
-# ! 运行时会 500，待解决
 @app.get("/api/lyrics/{filename}")
 async def get_lyrics(filename: str):
     # 读取歌词文件
@@ -78,8 +66,7 @@ async def get_lyrics(filename: str):
 
     # 返回歌词内容
     try:
-        with open(lrc_path, "r", encoding="utf-8") as f:
-            return JSONResponse(content={"lyrics": f.read()})
+        return JSONResponse(content={"lyrics": lrc_path.read_text("utf-8")})
     except Exception as e:
         return JSONResponse(status_code=500, content={"lyrics": "", "error": str(e)})
 
@@ -87,6 +74,5 @@ async def get_lyrics(filename: str):
 if __name__ == "__main__":
     uvicorn_run(app, host="localhost", port=41004)
 
-# todo: 修复歌曲名称显示 bug
 # todo：修复歌词显示偏移 bug
 # todo：将 paio.py 基于命令行的交互挪到网页上

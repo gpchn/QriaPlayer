@@ -153,3 +153,7 @@ def kugou_search(): ...
 
 
 def kugou_analyze(): ...
+
+
+if __name__ == "__main__":
+    main()

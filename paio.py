@@ -41,12 +41,12 @@ def main():
             exit(1)
 
         # 获取指定歌曲 tuple
-        print("(2/4) 获取歌曲 id")
+        print("正在获取歌曲 ID……")
         choosed_song = songs[choosed_inedx - 1]
         music_id = choosed_song[0]
 
         # 解析直链
-        print("(3/4) 获取歌曲直链")
+        print("正在下载歌曲……")
         """
         if choosed_inedx <= 5:
             mp3_data = ncm_analyze(music_id)
@@ -69,12 +69,9 @@ def main():
         if lrc_path.exists():
             lrc_path.unlink()
 
-        print(f"(4/4) 保存歌曲到 {save_path}")
         # 写入数据
         save_path.write_bytes(mp3_data)
         lrc_path.write_text(lrc_data, encoding="utf-8")
-
-        print("下载完成！\n")
 
 
 # 网易云音乐搜索
@@ -82,7 +79,7 @@ def ncm_search(name: str, num: int = 10) -> list:
     # 通过 name 搜索匹配度最高的前 5 个
     resq_search = get(NCM_SEARCH_API % (name, num))
 
-    print("(1/4) 搜索匹配歌曲")
+    print("正在搜索匹配歌曲……")
     # 获取每首音乐的信息
     search_result = loads_json(resq_search.text).get("result").get("songs")
     songs = []

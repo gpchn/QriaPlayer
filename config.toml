@@ -15,3 +15,7 @@ search = "https://c.y.qq.com/soso/fcgi-bin/music_search_new_platform?format=json
 [kugou]
 direct_link = ""
 search = ""
+
+[server]
+host = "localhost"
+port = 41004

@@ -1,5 +1,5 @@
 from pathlib import Path
-from paio import ncm_search, ncm_lyric
+from download import ncm_search, ncm_lyric
 
 
 musics = Path("musics").glob("*")

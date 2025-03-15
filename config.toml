@@ -1,21 +1,19 @@
-[ncm]
-# % id
-direct_link = "https://www.byfuns.top/api/1/?id=%s"
-# % (name, num)
-search = "https://music.163.com/api/search/get/web?csrf_token=hlpretag=&hlposttag=&s=%s&type=1&offset=0&total=true&limit=%s"
-# % id
-lyric = "https://music.163.com/api/song/lyric?os=pc&id=%s&lv=-1"
-
-[qq]
-# % id
-direct_link = "https://api.itooi.cn/tencent/url?id=%s&quality=mp3"
-# % (name, num)
-search = "https://c.y.qq.com/soso/fcgi-bin/music_search_new_platform?format=json&p=0&w=%s&n=%s"
-
-[kugou]
-direct_link = ""
-search = ""
-
 [server]
 host = "localhost"
 port = 41004
+
+[api.ncm]
+# % (name, num)
+search = "https://music.163.com/api/search/get/web?csrf_token=hlpretag=&hlposttag=&s=%s&type=1&offset=0&total=true&limit=%s"
+# % id
+direct_link = "https://www.byfuns.top/api/1/?id=%s"
+# % id
+lyric = "https://music.163.com/api/song/lyric?os=pc&id=%s&lv=-1"
+
+[api.kugou]
+# % (name, num)
+search = "https://songsearch.kugou.com/song_search_v2?keyword=%s&platform=WebFilter&format=json&page=1&pagesize=%s"
+# % md5_hash
+direct_link = "https://api.gumengya.com/Api/KuGou?App=1&id=%s&key=87996&Vip=1032934"
+# 
+lyric = ""

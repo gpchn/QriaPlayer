@@ -142,6 +142,7 @@ function updateLyrics(currentTime) {
     .join("");
 
   // 滚动歌词到视图中央
+  // ! need to fix
   if (activeIndex !== -1) {
     const activeLine = lyricsBox.children[activeIndex];
     if (activeLine) {

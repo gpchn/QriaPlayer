@@ -42,7 +42,7 @@ function renderPlaylist(list) {
       // 新增文件名解析
       const [songName, artist] = song.replace(".mp3", "").split(" - ");
       return `
-        <li onclick="loadSong('${song}')">
+        <li onclick="loadSong('${song.replace(/'/g, "\\'")}')">
             <div class="song-name">${songName}</div>
             <div class="song-artist">${artist || "未知艺术家"}</div>
         </li>

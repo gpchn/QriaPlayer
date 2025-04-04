@@ -4,16 +4,16 @@ port = 41004
 
 [api.ncm]
 # % (name, num)
-search = "https://music.163.com/api/search/get/web?csrf_token=hlpretag=&hlposttag=&s=%s&type=1&offset=0&total=true&limit=%s"
+search = "http://music.163.com/api/search/get/web?csrf_token=hlpretag=&hlposttag=&s=%s&type=1&offset=0&total=true&limit=%s"
 # % id
-direct_link = "https://www.byfuns.top/api/1/?id=%s"
+direct_link = "http://www.byfuns.top/api/1/?id=%s"
 # % id
-lyric = "https://music.163.com/api/song/lyric?os=pc&id=%s&lv=-1"
+lyric = "http://music.163.com/api/song/lyric?os=pc&id=%s&lv=-1"
 
-[api.kugou]
-# % (name, num)
-search = "https://songsearch.kugou.com/song_search_v2?keyword=%s&platform=WebFilter&format=json&page=1&pagesize=%s"
-# % md5_hash
-direct_link = "https://api.gumengya.com/Api/KuGou?App=1&id=%s&key=87996&Vip=1032934"
-# 
+[api.kuwo]
+# % (name, page, num)
+search = "http://search.kuwo.cn/r.s?all=%s&ft=music&itemset=web_2013&client=kt&pn=%s&rn=%s&rformat=json&encoding=utf8"
+# % mid
+direct_link = "http://antiserver.kuwo.cn/anti.s?type=convert_url&rid=%s&format=mp3&response=url"
+# ?
 lyric = ""

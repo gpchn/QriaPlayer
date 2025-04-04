@@ -2,15 +2,15 @@ body {
   margin: 0;
   height: 100vh;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background: #1a1a1a;
-  color: white;
+  background: #1a1a1a; /* 设置深色背景 */
+  color: white; /* 设置字体颜色为白色 */
   display: flex;
-  overflow: hidden;
+  overflow: hidden; /* 隐藏溢出的内容 */
 }
 
 .container {
   display: grid;
-  grid-template-columns: 380px 1fr;
+  grid-template-columns: 380px 1fr; /* 左侧固定宽度，右侧自适应 */
   gap: 0;
   width: 100%;
   height: 100vh;
@@ -18,90 +18,90 @@ body {
 
 /* 左侧播放列表 */
 .playlist-container {
-  background: #2d2d2d;
+  background: #2d2d2d; /* 设置播放列表背景色 */
   padding: 20px;
-  height: calc(100vh - 40px);
-  overflow-y: auto;
+  height: calc(100vh - 40px); /* 减去内边距后的高度 */
+  overflow-y: auto; /* 启用垂直滚动条 */
 }
 
-/* 自定义滚动条 */
+/* 自定义滚动条样式 */
 .playlist-container::-webkit-scrollbar,
 .lyrics-container::-webkit-scrollbar {
   width: 8px;
-  background: #252525;
+  background: #252525; /* 滚动条背景色 */
 }
 
 .playlist-container::-webkit-scrollbar-thumb,
 .lyrics-container::-webkit-scrollbar-thumb {
-  background: #1db954;
+  background: #1db954; /* 滚动条滑块颜色 */
   border-radius: 4px;
 }
 
 #searchBox {
-  width: 100%; /* 修改为100%宽度 */
+  width: 100%; /* 搜索框宽度占满父容器 */
   padding: 12px;
   margin: 10px 0;
-  background: #383838;
-  border: 1px solid #444;
+  background: #383838; /* 搜索框背景色 */
+  border: 1px solid #444; /* 边框颜色 */
   border-radius: 8px;
   color: white;
   font-size: 14px;
-  transition: all 0.3s ease;
+  transition: all 0.3s ease; /* 添加过渡效果 */
 }
 
 #searchBox:focus {
   outline: none;
-  border-color: #1db954;
-  box-shadow: 0 0 0 2px rgba(29, 185, 84, 0.2);
+  border-color: #1db954; /* 聚焦时边框颜色 */
+  box-shadow: 0 0 0 2px rgba(29, 185, 84, 0.2); /* 聚焦时的阴影效果 */
 }
 
 #playlist {
-  list-style: none;
+  list-style: none; /* 移除列表项的默认样式 */
   padding: 0;
   margin: 0;
 }
 
 #playlist li {
   padding: 12px;
-  cursor: pointer;
+  cursor: pointer; /* 鼠标悬停时显示手型 */
   border-radius: 6px;
   margin: 4px 0;
-  background: #383838;
-  transition: all 0.2s ease;
+  background: #383838; /* 列表项背景色 */
+  transition: all 0.2s ease; /* 添加过渡效果 */
 }
 
 #playlist li:hover {
-  background: #454545;
-  transform: translateX(4px);
+  background: #454545; /* 悬停时背景色 */
+  transform: translateX(4px); /* 悬停时向右移动 */
 }
 
 /* 右侧播放器 */
 .player-container {
-  background: #252525;
+  background: #252525; /* 播放器背景色 */
   padding: 30px;
-  height: calc(100vh - 60px);
+  height: calc(100vh - 60px); /* 减去内边距后的高度 */
   display: flex;
-  flex-direction: column;
+  flex-direction: column; /* 垂直布局 */
 }
 
 .song-info {
-  text-align: center;
+  text-align: center; /* 居中对齐 */
   margin-bottom: 25px;
 }
 
 .song-info h2 {
   margin: 0 0 8px 0;
-  font-size: 24px;
-  letter-spacing: 1px;
+  font-size: 24px; /* 歌曲标题字体大小 */
+  letter-spacing: 1px; /* 字符间距 */
 }
 
 .song-info p {
   margin: 0;
-  color: #aaa;
+  color: #aaa; /* 歌曲信息字体颜色 */
   font-size: 14px;
 }
 
-/* 进度条 */
+/* 进度条样式 */
 .progress-container {
   margin: 20px 0;
   position: relative;
@@ -112,7 +112,7 @@ body {
   height: 6px;
   -webkit-appearance: none;
   appearance: none;
-  background: #383838;
+  background: #383838; /* 进度条背景色 */
   border-radius: 3px;
   cursor: pointer;
 }
@@ -121,31 +121,31 @@ body {
   -webkit-appearance: none;
   width: 16px;
   height: 16px;
-  background: #1db954;
+  background: #1db954; /* 滑块颜色 */
   border-radius: 50%;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  transition: transform 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); /* 滑块阴影 */
+  transition: transform 0.2s ease; /* 添加过渡效果 */
 }
 
 .progress::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
+  transform: scale(1.2); /* 悬停时放大滑块 */
 }
 
 .time-display {
   display: flex;
-  justify-content: space-between;
-  color: #888;
+  justify-content: space-between; /* 两端对齐 */
+  color: #888; /* 时间显示字体颜色 */
   font-size: 13px;
   margin-top: 8px;
 }
 
-/* 控制按钮 */
+/* 控制按钮样式 */
 .controls {
   display: flex;
   align-items: center;
   gap: 20px;
   padding: 10px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.05); /* 半透明背景 */
   border-radius: 30px;
   margin-top: auto;
   justify-content: center; /* 居中对齐 */
@@ -158,16 +158,16 @@ button {
   align-items: center;
   justify-content: center;
   border: none;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.1); /* 按钮背景色 */
   color: white;
   border-radius: 50%;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s ease; /* 添加过渡效果 */
 }
 
 button:hover {
-  background: #1db954;
-  transform: scale(1.1);
+  background: #1db954; /* 悬停时背景色 */
+  transform: scale(1.1); /* 悬停时放大按钮 */
 }
 
 #loopBtn {
@@ -181,7 +181,7 @@ button:hover {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.08); /* 半透明背景 */
   padding: 8px 16px;
   border-radius: 25px;
 }
@@ -191,7 +191,7 @@ button:hover {
   height: 4px;
   -webkit-appearance: none;
   appearance: none;
-  background: #383838;
+  background: #383838; /* 音量条背景色 */
   border-radius: 2px;
   cursor: pointer;
 }
@@ -200,28 +200,28 @@ button:hover {
   -webkit-appearance: none;
   width: 12px;
   height: 12px;
-  background: #fff;
+  background: #fff; /* 滑块颜色 */
   border-radius: 50%;
 }
 
-/* 歌词容器 */
+/* 歌词容器样式 */
 .lyrics-container {
   flex: 1;
-  overflow-y: auto;
+  overflow-y: auto; /* 启用垂直滚动条 */
   margin: 15px 0;
   padding: 20px;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.3); /* 半透明背景 */
   border-radius: 12px;
-  text-align: center;
+  text-align: center; /* 居中对齐 */
   font-size: 18px;
-  line-height: 2.2;
-  scroll-behavior: smooth;
+  line-height: 2.2; /* 行高 */
+  scroll-behavior: smooth; /* 平滑滚动 */
 }
 
 .lyrics-highlight {
-  color: #1db954;
+  color: #1db954; /* 高亮歌词颜色 */
   font-weight: 600;
-  transform: scale(1.05);
+  transform: scale(1.05); /* 放大效果 */
   display: inline-block;
 }
 
@@ -229,15 +229,15 @@ button:hover {
 #playlist li {
   padding: 10px 15px;
   display: flex;
-  flex-direction: column;
+  flex-direction: column; /* 垂直布局 */
 }
 
 .song-name {
-  font-size: 15px;
+  font-size: 15px; /* 歌曲名称字体大小 */
   margin-bottom: 3px;
 }
 
 .song-artist {
-  font-size: 12px;
-  color: #888;
+  font-size: 12px; /* 歌手名称字体大小 */
+  color: #888; /* 歌手名称字体颜色 */
 }

@@ -18,35 +18,37 @@ except ModuleNotFoundError:
 # 读取配置文件
 cfg_path = Path("config.toml")
 cfg = loads(cfg_path.read_text())
-HOST = cfg.get("server").get("host")
-PORT = cfg.get("server").get("port")
+HOST = cfg.get("server").get("host")  # 从配置文件中读取服务器主机地址
+PORT = cfg.get("server").get("port")  # 从配置文件中读取服务器端口号
 
 init()
 
 app = FastAPI()
 
 # 挂载静态资源
-app.mount("/static", StaticFiles(directory="static"), name="static")
-app.mount("/musics", StaticFiles(directory="musics"), name="musics")
+app.mount("/static", StaticFiles(directory="static"), name="static")  # 静态文件目录
+app.mount("/musics", StaticFiles(directory="musics"), name="musics")  # 音乐文件目录
 
-# 音乐和歌词文件夹
+# 音乐和歌词文件夹路径
 music_dir = Path("musics")
 lyrics_dir = Path("lyrics")
 
 
 @app.get("/", response_class=FileResponse)
 async def index():
+    """返回主页 HTML 文件"""
     return FileResponse("static/index.html")
 
 
 @app.get("/favicon.ico")
 def favicon():
+    """返回网站图标"""
     return FileResponse("static/favicon.ico")
 
 
 @app.get("/api/music")
 async def get_music_list():
-    # 读取音乐文件列表
+    """获取音乐文件列表"""
     try:
         music_files = [
             f.name for f in music_dir.iterdir() if f.suffix.lower() == ".mp3"
@@ -60,12 +62,12 @@ async def get_music_list():
 
 @app.get("/api/music/{filename}")
 async def get_music_info(filename: str):
-    # 检查音乐文件是否存在
+    """获取指定音乐文件的信息"""
     filepath = Path("musics") / filename
     if not filepath.exists():
         raise HTTPException(status_code=404, detail="音乐文件未找到")
 
-    # 解析音乐文件
+    # 解析音乐文件名，格式为 "标题 - 艺术家.mp3"
     filename_parts = Path(filename).stem.split(" - ", 1)
     title = filename_parts[0]
     artist = filename_parts[1] if len(filename_parts) > 1 else "未知艺术家"
@@ -78,12 +80,11 @@ async def get_music_info(filename: str):
 
 @app.get("/api/lyrics/{filename}")
 async def get_lyrics(filename: str):
-    # 读取歌词文件
+    """获取歌词内容"""
     lrc_path = lyrics_dir / filename
     if not lrc_path.exists():
         raise HTTPException(status_code=404, detail="歌词文件未找到")
 
-    # 返回歌词内容
     try:
         return JSONResponse(content={"lyrics": lrc_path.read_text("utf-8")})
     except Exception as e:
@@ -93,14 +94,14 @@ async def get_lyrics(filename: str):
 # 系统托盘模块
 class SysTray:
     def __init__(self, log_dir: Path):
+        """初始化系统托盘"""
         self.log_dir = log_dir
         self.icon = None
         self._init_icon()
 
     def _init_icon(self):
-        """初始化托盘图标"""
-        # 加载图标文件
-        image = Image.open("paio.ico")
+        """初始化托盘图标和菜单"""
+        image = Image.open("paio.ico")  # 加载托盘图标文件
 
         menu = (
             MenuItem("打开页面", self._open_in_browser),
@@ -144,7 +145,7 @@ class SysTray:
         return None
 
     def _open_in_browser(self, *args):
-        """打开浏览器"""
+        """在默认浏览器中打开主页"""
         from webbrowser import open
 
         open(f"http://{HOST}:{PORT}")
@@ -199,6 +200,7 @@ def configure_logging():
 
 
 def start_server():
+    """启动服务器和系统托盘"""
     from uvicorn import run
 
     # 配置日志

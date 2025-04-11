@@ -1,6 +1,6 @@
 [project]
 name = "paio"
-version = "0.1.1"
+version = "0.1.2"
 description = "Paio 是一个基于 Python 的音乐播放器，它集成了音乐下载、播放、歌词显示、播放列表管理等功能。"
 readme = "README.md"
 requires-python = ">=3.12"

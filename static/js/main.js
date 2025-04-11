@@ -1,7 +1,7 @@
 const audio = new Audio();
 let currentSong = null;
 let lyricsData = [];
-let loopMode = "none";
+let loopMode = "all"; // 默认循环模式改为顺序播放
 
 // 初始化页面加载事件
 window.addEventListener("load", async () => {
@@ -164,12 +164,12 @@ function togglePlay() {
 }
 
 function toggleLoopMode() {
-  // 切换循环模式：无循环、单曲循环、列表循环
-  const modes = ["none", "single", "all"];
+  // 切换循环模式：无循环、单曲循环、列表循环、随机
+  const modes = ["none", "single", "all", "random"];
   loopMode = modes[(modes.indexOf(loopMode) + 1) % modes.length];
   audio.loop = loopMode === "single";
   document.getElementById("loopBtn").textContent = `循环：${
-    ["关", "单曲", "全部"][modes.indexOf(loopMode)]
+    ["关", "单曲", "全部", "随机"][modes.indexOf(loopMode)]
   }`;
 }
 
@@ -180,22 +180,59 @@ function toggleMute() {
 
 function handlePlayEnd() {
   // 播放结束后的处理逻辑
+  const playlist = JSON.parse(
+    document.getElementById("playlist").dataset.originalList
+  );
   if (loopMode === "single") {
     audio.play(); // 单曲循环
   } else if (loopMode === "all") {
-    const playlist = JSON.parse(
-      document.getElementById("playlist").dataset.originalList
-    );
     const currentIndex = playlist.indexOf(currentSong);
     const nextIndex = (currentIndex + 1) % playlist.length;
     loadSong(playlist[nextIndex]); // 播放下一首
+  } else if (loopMode === "random") {
+    const randomIndex = Math.floor(Math.random() * playlist.length);
+    loadSong(playlist[randomIndex]); // 随机播放
+  }
+}
+
+function playPrevious() {
+  // 播放上一首
+  const playlist = JSON.parse(
+    document.getElementById("playlist").dataset.originalList
+  );
+  if (loopMode === "random") {
+    const randomIndex = Math.floor(Math.random() * playlist.length);
+    loadSong(playlist[randomIndex]); // 随机播放
+  } else {
+    const currentIndex = playlist.indexOf(currentSong);
+    const prevIndex = (currentIndex - 1 + playlist.length) % playlist.length;
+    loadSong(playlist[prevIndex]);
+  }
+}
+
+function playNext() {
+  // 播放下一首
+  const playlist = JSON.parse(
+    document.getElementById("playlist").dataset.originalList
+  );
+  if (loopMode === "random") {
+    const randomIndex = Math.floor(Math.random() * playlist.length);
+    loadSong(playlist[randomIndex]); // 随机播放
+  } else {
+    const currentIndex = playlist.indexOf(currentSong);
+    const nextIndex = (currentIndex + 1) % playlist.length;
+    loadSong(playlist[nextIndex]);
   }
 }
 
 // 实时更新播放进度和歌词
 audio.addEventListener("timeupdate", () => {
-  document.getElementById("progressBar").value =
-    (audio.currentTime / audio.duration) * 100 || 0;
+  const progressBar = document.getElementById("progressBar");
+  const progressValue = (audio.currentTime / audio.duration) * 100 || 0;
+  progressBar.value = progressValue;
+
+  // 更新进度条样式
+  progressBar.style.background = `linear-gradient(to right, #2e7d32 0%, #2e7d32 ${progressValue}%, #555 ${progressValue}%, #555 100%)`;
 
   document.getElementById("currentTime").textContent = formatTime(
     audio.currentTime

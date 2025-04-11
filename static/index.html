@@ -47,8 +47,10 @@
 
         <!-- 控制按钮 -->
         <div class="controls">
+          <button onclick="playPrevious()" id="prevBtn">⏮</button>
           <button onclick="togglePlay()" id="playBtn">▶</button>
-          <button onclick="toggleLoopMode()" id="loopBtn">循环：关</button>
+          <button onclick="playNext()" id="nextBtn">⏭</button>
+          <button onclick="toggleLoopMode()" id="loopBtn">循环：全部</button>
           <div class="volume-container">
             <button onclick="toggleMute()" id="muteBtn">🔊</button>
             <input

@@ -131,6 +131,22 @@ body {
   transform: scale(1.2); /* 悬停时放大滑块 */
 }
 
+.progress-container input[type="range"].progress {
+  background: linear-gradient(to right, #4caf50 0%, #4caf50 0%, #ccc 0%, #ccc 100%);
+}
+
+.progress-low {
+  background: linear-gradient(to right, #ff5722 0%, #ff5722 100%);
+}
+
+.progress-medium {
+  background: linear-gradient(to right, #ffc107 0%, #ffc107 100%);
+}
+
+.progress-high {
+  background: linear-gradient(to right, #4caf50 0%, #4caf50 100%);
+}
+
 .time-display {
   display: flex;
   justify-content: space-between; /* 两端对齐 */

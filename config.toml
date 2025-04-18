@@ -7,6 +7,7 @@ port = 41004
 search = "http://music.163.com/api/search/get/web?csrf_token=hlpretag=&hlposttag=&s=%s&type=1&offset=0&total=true&limit=%s"
 # % id
 direct_link = "http://www.byfuns.top/api/1/?id=%s"
+#direct_link = "http://music.163.com/song/media/outer/url?id=%s.mp3"
 # % id
 lyric = "http://music.163.com/api/song/lyric?os=pc&id=%s&lv=-1"
 

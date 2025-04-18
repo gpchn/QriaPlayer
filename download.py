@@ -1,10 +1,9 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # coding=utf-8
 from pathlib import Path
 from orjson import loads as loads_json
 from tomllib import loads as loads_toml
 from colorama import init, Fore
-from httpx import get
 
 init()
 
@@ -13,6 +12,25 @@ CONFIG = loads_toml(CONFIG_PATH.read_text())
 SEARCH_API = CONFIG["api"]["ncm"]["search"]
 DLINK_API = CONFIG["api"]["ncm"]["direct_link"]
 LYRIC_API = CONFIG["api"]["ncm"]["lyric"]
+
+
+def get(url: str):
+    from httpx import get as httpx_get
+
+    try:
+        resp = httpx_get(
+            url,
+            headers={
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36"
+            },
+            timeout=10
+        )
+        resp.raise_for_status()
+        return resp
+    except Exception as e:
+        print("网络错误！")
+        print(e)
+        exit(1)
 
 
 def main():
@@ -37,10 +55,12 @@ def main():
         music_id = choosed_song[0]
 
         # 解析直链
-        print("正在下载歌曲……")
+        print(f"正在下载歌曲（ID：{music_id}）……")
         mp3_data = get_dlink(music_id)
+        print(f"正在下载歌词……")
         lrc_data = get_lyric(music_id)
 
+        print("下载完成，保存中……")
         # 创建文件的 Path 对象
         music_name = f"{choosed_song[1]} - {choosed_song[2]}"
         save_path = Path(f"./musics/{music_name}.mp3")

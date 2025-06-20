@@ -5,7 +5,11 @@ description = "Paio 是一个基于 Python 的音乐播放器，它集成了音�
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "bilibili-api-python>=17.2.1",
     "fastapi>=0.115.13",
+    "httpx>=0.28.1",
+    "orjson>=3.10.18",
+    "pyffmpeg>=2.4.3",
     "pywebview>=5.4",
     "uvicorn>=0.34.3",
 ]

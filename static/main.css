@@ -98,6 +98,11 @@ body {
 .song-info {
   text-align: center; /* 居中对齐 */
   margin-bottom: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #252525;
+  padding-bottom: 10px;
 }
 
 .song-info h2 {
@@ -114,8 +119,11 @@ body {
 
 /* 进度条样式 */
 .progress-container {
-  margin: 10px 0;
-  position: relative;
+  margin: 0;
+  background: #252525;
+  z-index: 3;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
 .progress {
@@ -174,13 +182,17 @@ body {
   padding: 10px;
   background: rgba(255, 255, 255, 0.05); /* 半透明背景 */
   border-radius: 30px;
-  margin-top: auto;
+  margin-top: 0;
+  margin-bottom: 0;
   justify-content: center; /* 居中对齐 */
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
 }
 
 button {
-  width: 50px;
-  height: 50px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -190,6 +202,13 @@ button {
   border-radius: 50%;
   cursor: pointer;
   transition: all 0.3s ease; /* 添加过渡效果 */
+  padding: 0;
+}
+
+button img {
+  width: 24px;
+  height: 24px;
+  pointer-events: none;
 }
 
 button:hover {
@@ -199,43 +218,47 @@ button:hover {
 
 #loopBtn {
   width: auto;
-  padding: 0 20px;
+  padding: 0 12px 0 8px;
   border-radius: 25px;
   font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+#loopBtn img {
+  width: 20px;
+  height: 20px;
 }
 
 .volume-container {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   background: rgba(255, 255, 255, 0.08); /* 半透明背景 */
-  padding: 8px 16px;
+  padding: 8px 12px;
   border-radius: 25px;
 }
 
-#volumeSlider {
-  width: 80px;
-  height: 4px;
-  -webkit-appearance: none;
-  appearance: none;
-  background: #383838; /* 音量条背景色 */
-  border-radius: 2px;
-  cursor: pointer;
+#muteBtn {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  border-radius: 50%;
+  padding: 0;
 }
 
-#volumeSlider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 12px;
-  height: 12px;
-  background: #fff; /* 滑块颜色 */
-  border-radius: 50%;
+#muteBtn img {
+  width: 20px;
+  height: 20px;
 }
 
 /* 歌词容器样式 */
 .lyrics-container {
   flex: 1 1 auto;
   overflow-y: auto;
-  margin: 15px 0;
+  margin: 0 0 15px 0;
   padding: 20px;
   background: rgba(0, 0, 0, 0.3);
   border-radius: 12px;
@@ -244,7 +267,7 @@ button:hover {
   line-height: 2.2;
   scroll-behavior: smooth;
   min-height: 120px;
-  max-height: 320px;
+  max-height: none;
   -webkit-mask-image: linear-gradient(
     to bottom,
     transparent 0%,
@@ -347,4 +370,25 @@ button:hover {
   #volumeSlider {
     width: 60px;
   }
+}
+
+#playlist li.video-item {
+  background: #2e3a4d;
+  border-left: 4px solid #1db9e7;
+  color: #b3e5fc;
+}
+
+#playlist li.video-item:hover {
+  background: #39506a;
+}
+
+.video-tag {
+  display: inline-block;
+  background: #1db9e7;
+  color: #fff;
+  font-size: 11px;
+  border-radius: 4px;
+  padding: 1px 6px;
+  margin-left: 6px;
+  vertical-align: middle;
 }

@@ -11,60 +11,108 @@ class Player {
   }
 
   async loadPlaylist() {
-    const res = await fetch("/api/music");
-    const { music_list } = await res.json();
-    this.playlist = music_list;
+    // 获取歌曲列表
+    const musicRes = await fetch("/api/music_list");
+    const { music_list } = await musicRes.json();
+    // 获取视频列表
+    const videoRes = await fetch("/api/video_list");
+    const { video_list } = await videoRes.json();
+
+    // 歌曲格式化
+    const musicItems = music_list.map((item) => {
+      // item: "[歌名] - [歌手]"
+      const [title, artist] = item.replace(".mp3", "").split(" - ");
+      return {
+        type: "music",
+        filename: item,
+        title: title || item.replace(".mp3", ""),
+        artist: artist || "未知艺术家",
+      };
+    });
+
+    // 视频格式化
+    const videoItems = video_list.map((item) => {
+      // item: "[视频名] - [作者]"
+      const [title, artist] = item.replace(/\.(mp4|webm|ogg)$/i, "").split(" - ");
+      return {
+        type: "video",
+        filename: item,
+        title: title || item,
+        artist: artist || "未知作者",
+      };
+    });
+
+    // 合并播放列表
+    this.playlist = [...musicItems, ...videoItems];
     this.renderPlaylist();
   }
 
   renderPlaylist(filter = "") {
     const list = filter
-      ? this.playlist.filter((s) => s.toLowerCase().includes(filter.toLowerCase()))
+      ? this.playlist.filter(
+          (s) =>
+            s.title.toLowerCase().includes(filter.toLowerCase()) ||
+            s.artist.toLowerCase().includes(filter.toLowerCase())
+        )
       : this.playlist;
     const ul = document.getElementById("playlist");
     ul.innerHTML = "";
-    list.forEach((song, idx) => {
-      const [name, artist] = song.replace(".mp3", "").split(" - ");
+    list.forEach((item, idx) => {
       const li = document.createElement("li");
       li.className = idx === this.currentIndex ? "playing" : "";
+      // 区分视频和音频
+      if (item.type === "video") {
+        li.classList.add("video-item");
+      }
       li.innerHTML = `
-        <div class="song-name">${name}</div>
-        <div class="song-artist">${artist || "未知艺术家"}</div>
+        <div class="song-name">${item.title}${item.type === "video" ? ' <span class="video-tag">[视频]</span>' : ""}</div>
+        <div class="song-artist">${item.artist}</div>
       `;
-      li.onclick = () => this.playByName(song);
+      li.onclick = () => this.playAt(this.playlist.indexOf(item));
       ul.appendChild(li);
     });
   }
 
   async playByName(filename) {
-    const idx = this.playlist.indexOf(filename);
+    const idx = this.playlist.findIndex((item) => item.filename === filename);
     if (idx !== -1) await this.playAt(idx);
   }
 
   async playAt(idx) {
     if (idx < 0 || idx >= this.playlist.length) return;
     this.currentIndex = idx;
-    const filename = this.playlist[idx];
-    // 歌曲元数据
-    let meta = { title: filename.replace(".mp3", ""), artist: "未知艺术家" };
-    try {
-      const res = await fetch(`/api/music/${filename}`);
-      meta = await res.json();
-    } catch {}
-    document.getElementById("songTitle").textContent = meta.title || filename.replace(".mp3", "");
-    document.getElementById("songArtist").textContent = meta.artist || "未知艺术家";
-    // 音频
-    this.audio.src = `/musics/${filename}`;
-    this.audio.play();
-    // 歌词
-    this.loadLyrics(filename);
+    const item = this.playlist[idx];
+
+    document.getElementById("songTitle").textContent = item.title;
+    document.getElementById("songArtist").textContent = item.artist;
+
+    if (item.type === "music") {
+      // 音频
+      this.audio.src = `/api/get_mp3/${item.filename}`;
+      this.audio.play();
+      // 歌词
+      this.loadLyrics(item.filename);
+    } else if (item.type === "video") {
+      // 视频项：这里只做提示，实际可扩展为弹窗或切换video标签
+      this.audio.pause();
+      this.audio.src = "";
+      this.lyrics = [];
+      this.updateLyrics(0);
+      alert("当前为视频项，请在支持的视频播放器中播放。");
+    }
     this.renderPlaylist(document.getElementById("searchBox").value);
   }
 
   async loadLyrics(filename) {
+    // 仅音频加载歌词
+    if (!filename.endsWith(".mp3")) {
+      this.lyrics = [];
+      this.updateLyrics(0);
+      return;
+    }
     this.lyrics = [];
     try {
-      const lrcRes = await fetch(`/api/lyrics/${filename.replace(".mp3", ".lrc")}`);
+      const lrcRes = await fetch(`/api/get_lrc/${filename.replace(".mp3", ".lrc")}`);
       const { lyrics } = await lrcRes.json();
       this.lyrics = this.parseLyrics(lyrics);
     } catch {
@@ -104,12 +152,21 @@ class Player {
           `<div class="${i === idx ? "lyrics-highlight" : ""}">${l.text}</div>`
       )
       .join("");
-    // 歌词滚动
+    // 歌词垂直居中：将当前歌词的中心与歌词框的中心对齐
     if (idx !== -1) {
       const active = box.children[idx];
       if (active) {
-        const cH = box.clientHeight, lT = active.offsetTop, lH = active.offsetHeight;
-        box.scrollTo({ top: lT - (cH - lH) / 2, behavior: "smooth" });
+        // 歌词框可视区域的中心
+        const boxRect = box.getBoundingClientRect();
+        const boxScrollTop = box.scrollTop;
+        const boxCenter = boxRect.height / 2;
+        // 当前歌词元素相对于歌词框顶部的距离
+        const activeRect = active.getBoundingClientRect();
+        const activeOffset = activeRect.top - boxRect.top + boxScrollTop;
+        const activeCenter = activeOffset + active.offsetHeight / 2;
+        // 滚动到让当前歌词居中
+        const targetScroll = activeCenter - boxCenter;
+        box.scrollTo({ top: targetScroll, behavior: "smooth" });
       }
     }
   }
@@ -134,19 +191,42 @@ class Player {
   }
 
   togglePlay() {
-    if (this.audio.paused) this.audio.play();
-    else this.audio.pause();
+    if (this.audio.paused) {
+      this.audio.play();
+      document.getElementById("playPauseIcon").src = "icons/pause.svg";
+      document.getElementById("playPauseIcon").alt = "暂停";
+    } else {
+      this.audio.pause();
+      document.getElementById("playPauseIcon").src = "icons/play.svg";
+      document.getElementById("playPauseIcon").alt = "播放";
+    }
   }
 
   toggleLoopMode() {
     this.loopMode = (this.loopMode + 1) % 4;
     this.audio.loop = this.loopMode === 1;
-    const txt = ["关", "单曲", "全部", "随机"][this.loopMode];
-    document.getElementById("loopBtn").textContent = `循环：${txt}`;
+    const txts = ["关", "单曲", "全部", "随机"];
+    const icons = [
+      "icons/loop-off.svg",  // ! 需要补全图标
+      "icons/loop-one.svg",
+      "icons/loop-list.svg",
+      "icons/loop-random.svg"
+    ];
+    document.getElementById("loopText").textContent = txts[this.loopMode];
+    document.getElementById("loopIcon").src = icons[this.loopMode];
+    document.getElementById("loopIcon").alt = "循环" + txts[this.loopMode];
   }
 
   toggleMute() {
     this.audio.muted = !this.audio.muted;
+    const muteIcon = document.getElementById("muteIcon");
+    if (this.audio.muted) {
+      muteIcon.src = "icons/mute.svg"; // ! 需要补全图标
+      muteIcon.alt = "静音";
+    } else {
+      muteIcon.src = "icons/volume.svg";
+      muteIcon.alt = "音量";
+    }
   }
 
   setVolume(val) {
@@ -195,7 +275,15 @@ class Player {
       document.getElementById("currentTime").textContent = this.formatTime(cur);
       document.getElementById("duration").textContent = this.formatTime(dur);
       this.updateLyrics(cur);
-      document.getElementById("playBtn").textContent = this.audio.paused ? "▶" : "⏸";
+      // 播放/暂停图标切换
+      const playPauseIcon = document.getElementById("playPauseIcon");
+      if (this.audio.paused) {
+        playPauseIcon.src = "icons/play.svg";
+        playPauseIcon.alt = "播放";
+      } else {
+        playPauseIcon.src = "icons/pause.svg";
+        playPauseIcon.alt = "暂停";
+      }
     });
     this.audio.addEventListener("ended", () => {
       if (this.loopMode === 1) this.audio.play();
@@ -205,6 +293,14 @@ class Player {
     this.audio.addEventListener("volumechange", () => {
       document.getElementById("muteBtn").textContent = this.audio.muted ? "🔇" : "🔊";
       document.getElementById("volumeSlider").value = this.audio.volume;
+      const muteIcon = document.getElementById("muteIcon");
+      if (this.audio.muted || this.audio.volume === 0) {
+        muteIcon.src = "icons/mute.svg";
+        muteIcon.alt = "静音";
+      } else {
+        muteIcon.src = "icons/volume.svg";
+        muteIcon.alt = "音量";
+      }
     });
     // 初始化音量
     this.audio.volume = 1;

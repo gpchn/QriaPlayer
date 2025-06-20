@@ -1,0 +1,4 @@
+[bilibili]
+# 搜索视频
+# keyword: 关键词
+search = "https://search.bilibili.com/video?keyword=%s"

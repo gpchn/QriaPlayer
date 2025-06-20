@@ -1,7 +1,15 @@
-log/
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
 dist/
-.venv/
-script/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Paio
+log/
 musics/
 lyrics/
-__pycache__/

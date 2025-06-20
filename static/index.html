@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Paio - Player All In One</title>
-    <link rel="stylesheet" href="/static/css/main.css" />
+    <link rel="stylesheet" href="main.css" />
   </head>
   <body>
     <div class="container">
@@ -14,21 +14,14 @@
         <input type="search" id="searchBox" placeholder="搜索歌曲..." />
         <ul id="playlist"></ul>
       </div>
-
-      <!-- 右侧播放控制 -->
+      <!-- 右侧播放器 -->
       <div class="player-container">
-        <!-- 歌词显示 -->
-        <div class="lyrics-container" id="lyricsBox"></div>
-
-        <!-- 歌曲信息 -->
         <div class="song-info">
           <h2 id="songTitle">- 请选取一首歌播放 -</h2>
           <p id="songArtist">-</p>
-          <!-- 添加默认值 -->
         </div>
-
-        <!-- 进度条 -->
         <div class="progress-container">
+          <label for="progressBar" class="visually-hidden">播放进度</label>
           <input
             type="range"
             id="progressBar"
@@ -37,36 +30,37 @@
             min="0"
             max="100"
             step="0.1"
-            title="Progress Bar"
+            title="播放进度"
+            placeholder="播放进度"
           />
           <div class="time-display">
             <span id="currentTime">0:00</span>
             <span id="duration">0:00</span>
           </div>
         </div>
-
-        <!-- 控制按钮 -->
+        <div class="lyrics-container" id="lyricsBox"></div>
         <div class="controls">
-          <button onclick="playPrevious()" id="prevBtn">⏮</button>
-          <button onclick="togglePlay()" id="playBtn">▶</button>
-          <button onclick="playNext()" id="nextBtn">⏭</button>
-          <button onclick="toggleLoopMode()" id="loopBtn">循环：全部</button>
+          <button id="prevBtn">⏮</button>
+          <button id="playBtn">▶</button>
+          <button id="nextBtn">⏭</button>
+          <button id="loopBtn">循环：全部</button>
           <div class="volume-container">
-            <button onclick="toggleMute()" id="muteBtn">🔊</button>
+            <button id="muteBtn">🔊</button>
             <input
               type="range"
               id="volumeSlider"
               min="0"
               max="1"
-              step="0.1"
+              step="0.01"
               value="1"
-              title="Adjust Volume"
+              title="音量调节"
+              placeholder="音量调节"
             />
           </div>
         </div>
       </div>
     </div>
 
-    <script src="/static/js/main.js"></script>
+    <script src="main.js"></script>
   </body>
 </html>

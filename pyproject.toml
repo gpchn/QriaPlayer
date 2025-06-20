@@ -1,17 +1,13 @@
 [project]
 name = "paio"
-version = "0.1.2"
+version = "1.0.0"
 description = "Paio 是一个基于 Python 的音乐播放器，它集成了音乐下载、播放、歌词显示、播放列表管理等功能。"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "colorama>=0.4.6",
-    "fastapi>=0.115.11",
-    "httpx>=0.28.1",
-    "orjson>=3.10.15",
-    "pillow>=11.1.0",
-    "pystray>=0.19.5",
-    "uvicorn[standard]>=0.34.0",
+    "fastapi>=0.115.13",
+    "pywebview>=5.4",
+    "uvicorn>=0.34.3",
 ]
 
 [[tool.uv.index]]

@@ -2,18 +2,19 @@ body {
   margin: 0;
   height: 100vh;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background: #1a1a1a; /* 设置深色背景 */
-  color: white; /* 设置字体颜色为白色 */
+  background: #1a1a1a;
+  color: white;
   display: flex;
-  overflow: hidden; /* 隐藏溢出的内容 */
+  overflow: hidden;
 }
 
 .container {
   display: grid;
-  grid-template-columns: 380px 1fr; /* 左侧固定宽度，右侧自适应 */
+  grid-template-columns: 380px 1fr;
   gap: 0;
   width: 100%;
   height: 100vh;
+  animation: fadeIn 0.5s ease;
 }
 
 /* 左侧播放列表 */
@@ -75,6 +76,16 @@ body {
   transform: translateX(4px); /* 悬停时向右移动 */
 }
 
+#playlist li.playing {
+  background: #1db954;
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(29, 185, 84, 0.2);
+}
+
+#playlist li.playing .song-artist {
+  color: rgba(255, 255, 255, 0.8);
+}
+
 /* 右侧播放器 */
 .player-container {
   background: #252525; /* 播放器背景色 */
@@ -86,7 +97,7 @@ body {
 
 .song-info {
   text-align: center; /* 居中对齐 */
-  margin-bottom: 25px;
+  margin-bottom: 10px;
 }
 
 .song-info h2 {
@@ -103,7 +114,7 @@ body {
 
 /* 进度条样式 */
 .progress-container {
-  margin: 20px 0;
+  margin: 10px 0;
   position: relative;
 }
 
@@ -222,16 +233,32 @@ button:hover {
 
 /* 歌词容器样式 */
 .lyrics-container {
-  flex: 1;
-  overflow-y: auto; /* 启用垂直滚动条 */
+  flex: 1 1 auto;
+  overflow-y: auto;
   margin: 15px 0;
   padding: 20px;
-  background: rgba(0, 0, 0, 0.3); /* 半透明背景 */
+  background: rgba(0, 0, 0, 0.3);
   border-radius: 12px;
-  text-align: center; /* 居中对齐 */
+  text-align: center;
   font-size: 18px;
-  line-height: 2.2; /* 行高 */
-  scroll-behavior: smooth; /* 平滑滚动 */
+  line-height: 2.2;
+  scroll-behavior: smooth;
+  min-height: 120px;
+  max-height: 320px;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 10%,
+    black 90%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 10%,
+    black 90%,
+    transparent 100%
+  );
 }
 
 .lyrics-highlight {
@@ -256,4 +283,68 @@ button:hover {
 .song-artist {
   font-size: 12px; /* 歌手名称字体大小 */
   color: #888; /* 歌手名称字体颜色 */
+}
+
+/* 添加动画效果 */
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(10px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+/* 歌词淡入淡出效果 */
+.lyrics-container {
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 10%,
+    black 90%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 10%,
+    black 90%,
+    transparent 100%
+  );
+}
+
+/* 响应式布局支持 */
+@media (max-width: 768px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
+
+  .playlist-container {
+    display: none;
+  }
+
+  .player-container {
+    height: 100vh;
+    padding: 20px;
+  }
+
+  .controls {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .volume-container {
+    padding: 6px 12px;
+  }
+
+  #volumeSlider {
+    width: 60px;
+  }
 }

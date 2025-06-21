@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 # coding=utf-8
 
-import player
+import server
 import webview
 from os import _exit
 from threading import Thread
 
 # 启动后端
-player_thread = Thread(target=player.start) # type: ignore
-player_thread.start()
+server_thread = Thread(target=server.start) # type: ignore
+server_thread.start()
 # 启动前端
 main_window = webview.create_window(
     "Paio",

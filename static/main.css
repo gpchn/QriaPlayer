@@ -23,6 +23,7 @@ body {
   padding: 20px;
   height: calc(100vh - 40px); /* 减去内边距后的高度 */
   overflow-y: auto; /* 启用垂直滚动条 */
+  position: relative;
 }
 
 /* 自定义滚动条样式 */
@@ -93,6 +94,7 @@ body {
   height: calc(100vh - 60px); /* 减去内边距后的高度 */
   display: flex;
   flex-direction: column; /* 垂直布局 */
+  position: relative;
 }
 
 .song-info {
@@ -308,6 +310,15 @@ button:hover {
   color: #888; /* 歌手名称字体颜色 */
 }
 
+#loopText {
+  color: #999;
+  transition: color 0.3s;
+}
+
+#loopBtn:hover #loopText {
+  color: #111;
+}
+
 /* 添加动画效果 */
 @keyframes fadeIn {
   from { 
@@ -322,14 +333,14 @@ button:hover {
 
 /* 歌词淡入淡出效果 */
 .lyrics-container {
-  mask-image: linear-gradient(
+  -webkit-mask-image: linear-gradient(
     to bottom,
     transparent 0%,
     black 10%,
     black 90%,
     transparent 100%
   );
-  -webkit-mask-image: linear-gradient(
+  mask-image: linear-gradient(
     to bottom,
     transparent 0%,
     black 10%,
@@ -391,4 +402,47 @@ button:hover {
   padding: 1px 6px;
   margin-left: 6px;
   vertical-align: middle;
+}
+
+#scrollTopBtn {
+  position: fixed;
+  z-index: 200;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #1db954;
+  color: #fff;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s, transform 0.3s;
+  opacity: 0;
+  cursor: pointer;
+  right: 0;
+  bottom: 0;
+}
+
+@media (max-width: 900px) {
+  #scrollTopBtn {
+    right: 8px;
+    bottom: 12px;
+    left: auto;
+  }
+}
+
+#scrollTopBtn.show {
+  display: flex;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#scrollTopBtn img {
+  width: 22px;
+  height: 22px;
+}
+
+#scrollTopBtn:hover {
+  background: #14863b;
 }

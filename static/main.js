@@ -207,7 +207,7 @@ class Player {
     this.audio.loop = this.loopMode === 1;
     const txts = ["关", "单曲", "全部", "随机"];
     const icons = [
-      "icons/loop-off.svg",  // ! 需要补全图标
+      "icons/loop-off.svg",
       "icons/loop-one.svg",
       "icons/loop-list.svg",
       "icons/loop-random.svg"
@@ -221,7 +221,7 @@ class Player {
     this.audio.muted = !this.audio.muted;
     const muteIcon = document.getElementById("muteIcon");
     if (this.audio.muted) {
-      muteIcon.src = "icons/mute.svg"; // ! 需要补全图标
+      muteIcon.src = "icons/mute.svg";
       muteIcon.alt = "静音";
     } else {
       muteIcon.src = "icons/volume.svg";
@@ -251,6 +251,27 @@ class Player {
     document.getElementById("searchBox").addEventListener("input", (e) => {
       this.renderPlaylist(e.target.value);
     });
+    // 回到顶部按钮逻辑
+    const playlistContainer = document.querySelector(".playlist-container");
+    const scrollTopBtn = document.getElementById("scrollTopBtn");
+    function updateScrollTopBtnPos() {
+      const rect = playlistContainer.getBoundingClientRect();
+      scrollTopBtn.style.right = (window.innerWidth - rect.right + 16) + "px";
+      scrollTopBtn.style.bottom = (window.innerHeight - rect.bottom + 24) + "px";
+    }
+    window.addEventListener("resize", updateScrollTopBtnPos);
+    window.addEventListener("scroll", updateScrollTopBtnPos);
+    updateScrollTopBtnPos();
+    playlistContainer.addEventListener("scroll", () => {
+      if (playlistContainer.scrollTop > 120) {
+        scrollTopBtn.classList.add("show");
+      } else {
+        scrollTopBtn.classList.remove("show");
+      }
+    });
+    scrollTopBtn.onclick = () => {
+      playlistContainer.scrollTo({ top: 0, behavior: "smooth" });
+    };
     // 进度条
     document.getElementById("progressBar").addEventListener("input", (e) => {
       this.seek(e.target.value);
@@ -291,7 +312,6 @@ class Player {
       else if (this.loopMode === 3) this.playAt(Math.floor(Math.random() * this.playlist.length));
     });
     this.audio.addEventListener("volumechange", () => {
-      document.getElementById("muteBtn").textContent = this.audio.muted ? "🔇" : "🔊";
       document.getElementById("volumeSlider").value = this.audio.volume;
       const muteIcon = document.getElementById("muteIcon");
       if (this.audio.muted || this.audio.volume === 0) {

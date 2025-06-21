@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # coding=utf-8
 
-import orjson
 import fastapi
 import uvicorn
 from pathlib import Path

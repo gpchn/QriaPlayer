@@ -33,7 +33,9 @@ class Player {
     // 视频格式化
     const videoItems = video_list.map((item) => {
       // item: "[视频名] - [作者]"
-      const [title, artist] = item.replace(/\.(mp4|webm|ogg)$/i, "").split(" - ");
+      const [title, artist] = item
+        .replace(/\.(mp4|webm|ogg)$/i, "")
+        .split(" - ");
       return {
         type: "video",
         filename: item,
@@ -65,7 +67,9 @@ class Player {
         li.classList.add("video-item");
       }
       li.innerHTML = `
-        <div class="song-name">${item.title}${item.type === "video" ? ' <span class="video-tag">[视频]</span>' : ""}</div>
+        <div class="song-name">${item.title}${
+        item.type === "video" ? ' <span class="video-tag">[视频]</span>' : ""
+      }</div>
         <div class="song-artist">${item.artist}</div>
       `;
       li.onclick = () => this.playAt(this.playlist.indexOf(item));
@@ -112,7 +116,9 @@ class Player {
     }
     this.lyrics = [];
     try {
-      const lrcRes = await fetch(`/api/get_lrc/${filename.replace(".mp3", ".lrc")}`);
+      const lrcRes = await fetch(
+        `/api/get_lrc/${filename.replace(".mp3", ".lrc")}`
+      );
       const { lyrics } = await lrcRes.json();
       this.lyrics = this.parseLyrics(lyrics);
     } catch {
@@ -127,7 +133,10 @@ class Player {
       .map((line) => {
         const m = line.match(/^\[(\d+):(\d+)(?:\.(\d+))?\](.*)/);
         if (m) {
-          const t = parseInt(m[1]) * 60 + parseInt(m[2]) + (parseInt(m[3]) || 0) / 100;
+          const t =
+            parseInt(m[1]) * 60 +
+            parseInt(m[2]) +
+            ((m[3] ? parseInt(m[3].padEnd(3, '0')) : 0) / 1000);
           return { time: t, text: m[4].trim() };
         }
         return null;
@@ -143,8 +152,13 @@ class Player {
     }
     let idx = -1;
     for (let i = 0; i < this.lyrics.length; i++) {
-      if (currentTime >= this.lyrics[i].time) idx = i;
-      else break;
+      if (currentTime < this.lyrics[i].time) {
+        idx = i - 1;
+        break;
+      }
+    }
+    if (idx === -1 && currentTime >= this.lyrics[this.lyrics.length - 1].time) {
+      idx = this.lyrics.length - 1;
     }
     box.innerHTML = this.lyrics
       .map(
@@ -156,15 +170,12 @@ class Player {
     if (idx !== -1) {
       const active = box.children[idx];
       if (active) {
-        // 歌词框可视区域的中心
         const boxRect = box.getBoundingClientRect();
         const boxScrollTop = box.scrollTop;
         const boxCenter = boxRect.height / 2;
-        // 当前歌词元素相对于歌词框顶部的距离
         const activeRect = active.getBoundingClientRect();
         const activeOffset = activeRect.top - boxRect.top + boxScrollTop;
         const activeCenter = activeOffset + active.offsetHeight / 2;
-        // 滚动到让当前歌词居中
         const targetScroll = activeCenter - boxCenter;
         box.scrollTo({ top: targetScroll, behavior: "smooth" });
       }
@@ -210,7 +221,7 @@ class Player {
       "icons/loop-off.svg",
       "icons/loop-one.svg",
       "icons/loop-list.svg",
-      "icons/loop-random.svg"
+      "icons/loop-random.svg",
     ];
     document.getElementById("loopText").textContent = txts[this.loopMode];
     document.getElementById("loopIcon").src = icons[this.loopMode];
@@ -256,8 +267,8 @@ class Player {
     const scrollTopBtn = document.getElementById("scrollTopBtn");
     function updateScrollTopBtnPos() {
       const rect = playlistContainer.getBoundingClientRect();
-      scrollTopBtn.style.right = (window.innerWidth - rect.right + 16) + "px";
-      scrollTopBtn.style.bottom = (window.innerHeight - rect.bottom + 24) + "px";
+      scrollTopBtn.style.right = window.innerWidth - rect.right + 16 + "px";
+      scrollTopBtn.style.bottom = window.innerHeight - rect.bottom + 24 + "px";
     }
     window.addEventListener("resize", updateScrollTopBtnPos);
     window.addEventListener("scroll", updateScrollTopBtnPos);
@@ -289,9 +300,10 @@ class Player {
 
     // 音频事件
     this.audio.addEventListener("timeupdate", () => {
-      const cur = this.audio.currentTime, dur = this.audio.duration;
+      const cur = this.audio.currentTime,
+        dur = this.audio.duration;
       const bar = document.getElementById("progressBar");
-      bar.value = ((cur / dur) * 100) || 0;
+      bar.value = (cur / dur) * 100 || 0;
       bar.style.background = `linear-gradient(to right, #2e7d32 0%, #2e7d32 ${bar.value}%, #555 ${bar.value}%, #555 100%)`;
       document.getElementById("currentTime").textContent = this.formatTime(cur);
       document.getElementById("duration").textContent = this.formatTime(dur);
@@ -309,7 +321,8 @@ class Player {
     this.audio.addEventListener("ended", () => {
       if (this.loopMode === 1) this.audio.play();
       else if (this.loopMode === 2) this.playNext();
-      else if (this.loopMode === 3) this.playAt(Math.floor(Math.random() * this.playlist.length));
+      else if (this.loopMode === 3)
+        this.playAt(Math.floor(Math.random() * this.playlist.length));
     });
     this.audio.addEventListener("volumechange", () => {
       document.getElementById("volumeSlider").value = this.audio.volume;

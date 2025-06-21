@@ -152,10 +152,6 @@ body {
   transform: scale(1.2); /* 悬停时放大滑块 */
 }
 
-.progress-container input[type="range"].progress {
-  background: linear-gradient(to right, #4caf50 0%, #4caf50 0%, #ccc 0%, #ccc 100%);
-}
-
 .progress-low {
   background: linear-gradient(to right, #ff5722 0%, #ff5722 100%);
 }
@@ -321,13 +317,13 @@ button:hover {
 
 /* 添加动画效果 */
 @keyframes fadeIn {
-  from { 
-    opacity: 0; 
-    transform: translateY(10px); 
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -413,7 +409,7 @@ button:hover {
   background: #1db954;
   color: #fff;
   border: none;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
   display: none;
   align-items: center;
   justify-content: center;

@@ -65,4 +65,4 @@ async def route_get_lrc(filename: str):
 
 
 def start():
-    uvicorn.run("player:app", host="localhost", port=41004)
+    uvicorn.run("server:app", host="localhost", port=41004)

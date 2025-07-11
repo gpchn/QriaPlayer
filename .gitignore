@@ -9,7 +9,7 @@ wheels/
 # Virtual environments
 .venv
 
-# Paio
+# Player
 log/
 musics/
 lyrics/

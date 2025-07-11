@@ -27,12 +27,14 @@ async def route_index():
 
 @app.get("/{filename}")
 async def route_favicon(filename):
-    return fastapi.responses.FileResponse(static / filename)
-
-
-@app.get("/icons/{filename}")
-async def route_icons(filename):
-    return fastapi.responses.FileResponse(static / "icons" / filename)
+    if filename.endswith(".html"):
+        return fastapi.responses.FileResponse(static / filename)
+    elif filename.endswith(".svg"):
+        return fastapi.responses.FileResponse(static / "icons" / filename)
+    elif filename.endswith(".css"):
+        return fastapi.responses.FileResponse(static / "css" / filename)
+    elif filename.endswith(".js"):
+        return fastapi.responses.FileResponse(static / "js" / filename)
 
 
 @app.get("/api/music_list")

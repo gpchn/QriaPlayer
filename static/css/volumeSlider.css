@@ -1,4 +1,3 @@
-
 /* 重置音量滑块相关样式以修复位置问题 */
 #volumeSlider {
   -webkit-appearance: none;
@@ -15,7 +14,13 @@
   width: 100%;
   height: 5px;
   border-radius: 2.5px;
-  background: linear-gradient(to right, #14863b 0%, #14863b var(--volume-percent), #383838 var(--volume-percent), #383838 100%);
+  background: linear-gradient(
+    to right,
+    #14863b 0%,
+    #14863b var(--volume-percent),
+    #383838 var(--volume-percent),
+    #383838 100%
+  );
   cursor: pointer;
 }
 
@@ -42,7 +47,13 @@
   width: 100%;
   height: 5px;
   border-radius: 2.5px;
-  background: linear-gradient(to right, #14863b 0%, #14863b var(--volume-percent), #383838 var(--volume-percent), #383838 100%);
+  background: linear-gradient(
+    to right,
+    #14863b 0%,
+    #14863b var(--volume-percent),
+    #383838 var(--volume-percent),
+    #383838 100%
+  );
 }
 
 #volumeSlider::-moz-range-thumb {

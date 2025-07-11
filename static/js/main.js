@@ -93,7 +93,10 @@ class Player {
       const playingRect = playingElement.getBoundingClientRect();
 
       // 当前播放歌曲不在可视区域内时显示按钮
-      if (playingRect.top < playlistRect.top || playingRect.bottom > playlistRect.bottom) {
+      if (
+        playingRect.top < playlistRect.top ||
+        playingRect.bottom > playlistRect.bottom
+      ) {
         scrollToPlayingBtn.classList.add("show");
       } else {
         scrollToPlayingBtn.classList.remove("show");
@@ -165,7 +168,7 @@ class Player {
           const t =
             parseInt(m[1]) * 60 +
             parseInt(m[2]) +
-            ((m[3] ? parseInt(m[3].padEnd(3, '0')) : 0) / 1000);
+            (m[3] ? parseInt(m[3].padEnd(3, "0")) : 0) / 1000;
           return { time: t, text: m[4].trim() };
         }
         return null;
@@ -234,11 +237,11 @@ class Player {
   togglePlay() {
     if (this.audio.paused) {
       this.audio.play();
-      document.getElementById("playPauseIcon").src = "icons/pause.svg";
+      document.getElementById("playPauseIcon").src = "pause.svg";
       document.getElementById("playPauseIcon").alt = "暂停";
     } else {
       this.audio.pause();
-      document.getElementById("playPauseIcon").src = "icons/play.svg";
+      document.getElementById("playPauseIcon").src = "play.svg";
       document.getElementById("playPauseIcon").alt = "播放";
     }
   }
@@ -248,10 +251,10 @@ class Player {
     this.audio.loop = this.loopMode === 1;
     const txts = ["关", "单曲", "全部", "随机"];
     const icons = [
-      "icons/loop-off.svg",
-      "icons/loop-one.svg",
-      "icons/loop-list.svg",
-      "icons/loop-random.svg",
+      "loop-off.svg",
+      "loop-one.svg",
+      "loop-list.svg",
+      "loop-random.svg",
     ];
     document.getElementById("loopText").textContent = txts[this.loopMode];
     document.getElementById("loopIcon").src = icons[this.loopMode];
@@ -262,10 +265,10 @@ class Player {
     this.audio.muted = !this.audio.muted;
     const muteIcon = document.getElementById("muteIcon");
     if (this.audio.muted) {
-      muteIcon.src = "icons/mute.svg";
+      muteIcon.src = "mute.svg";
       muteIcon.alt = "静音";
     } else {
-      muteIcon.src = "icons/volume.svg";
+      muteIcon.src = "volume.svg";
       muteIcon.alt = "音量";
     }
   }
@@ -274,7 +277,7 @@ class Player {
     this.audio.volume = val;
     // 更新滑块颜色
     const volumeSlider = document.getElementById("volumeSlider");
-    volumeSlider.style.setProperty('--volume-percent', val * 100 + '%');
+    volumeSlider.style.setProperty("--volume-percent", val * 100 + "%");
   }
 
   seek(val) {
@@ -337,8 +340,10 @@ class Player {
       const rect = playlistContainer.getBoundingClientRect();
       scrollTopBtn.style.right = window.innerWidth - rect.right + 16 + "px";
       scrollTopBtn.style.bottom = window.innerHeight - rect.bottom + 24 + "px";
-      scrollToPlayingBtn.style.right = window.innerWidth - rect.right + 16 + "px";
-      scrollToPlayingBtn.style.bottom = window.innerHeight - rect.bottom + 76 + "px"; // 在顶部按钮上方
+      scrollToPlayingBtn.style.right =
+        window.innerWidth - rect.right + 16 + "px";
+      scrollToPlayingBtn.style.bottom =
+        window.innerHeight - rect.bottom + 76 + "px"; // 在顶部按钮上方
     }
 
     window.addEventListener("resize", updateScrollButtonsPos);
@@ -377,10 +382,10 @@ class Player {
       const value = e.target.value;
       this.setVolume(value);
       // 更新滑块颜色
-      volumeSlider.style.setProperty('--volume-percent', value * 100 + '%');
+      volumeSlider.style.setProperty("--volume-percent", value * 100 + "%");
     });
     // 初始设置滑块颜色
-    volumeSlider.style.setProperty('--volume-percent', '100%');
+    volumeSlider.style.setProperty("--volume-percent", "100%");
     // 控制按钮
     document.getElementById("playBtn").onclick = () => this.togglePlay();
     document.getElementById("prevBtn").onclick = () => this.playPrev();
@@ -399,16 +404,17 @@ class Player {
       document.getElementById("duration").textContent = this.formatTime(dur);
       this.updateLyrics(cur);
       // 定期检查当前播放歌曲是否在可视区域内
-      if (cur % 2 < 0.1) { // 每2秒检查一次，避免频繁检查
+      if (cur % 2 < 0.1) {
+        // 每2秒检查一次，避免频繁检查
         this.updateScrollToPlayingButton();
       }
       // 播放/暂停图标切换
       const playPauseIcon = document.getElementById("playPauseIcon");
       if (this.audio.paused) {
-        playPauseIcon.src = "icons/play.svg";
+        playPauseIcon.src = "play.svg";
         playPauseIcon.alt = "播放";
       } else {
-        playPauseIcon.src = "icons/pause.svg";
+        playPauseIcon.src = "pause.svg";
         playPauseIcon.alt = "暂停";
       }
     });
@@ -422,14 +428,17 @@ class Player {
       const volumeSlider = document.getElementById("volumeSlider");
       volumeSlider.value = this.audio.volume;
       // 更新滑块颜色
-      volumeSlider.style.setProperty('--volume-percent', this.audio.volume * 100 + '%');
+      volumeSlider.style.setProperty(
+        "--volume-percent",
+        this.audio.volume * 100 + "%"
+      );
 
       const muteIcon = document.getElementById("muteIcon");
       if (this.audio.muted || this.audio.volume === 0) {
-        muteIcon.src = "icons/mute.svg";
+        muteIcon.src = "mute.svg";
         muteIcon.alt = "静音";
       } else {
-        muteIcon.src = "icons/volume.svg";
+        muteIcon.src = "volume.svg";
         muteIcon.alt = "音量";
       }
     });

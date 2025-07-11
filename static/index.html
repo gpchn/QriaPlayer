@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>QriaPlayer</title>
+    <!-- CSS引入 -->
     <link rel="stylesheet" href="main.css" />
     <link rel="stylesheet" href="scrollToPlaying.css" />
     <link rel="stylesheet" href="volumeSlider.css" />
@@ -14,11 +15,15 @@
       <div class="playlist-container">
         <input type="search" id="searchBox" placeholder="搜索歌曲..." />
         <ul id="playlist"></ul>
-        <button id="scrollToPlayingBtn" title="定位到当前播放歌曲" aria-label="定位到当前播放歌曲">
-          <img src="icons/now-playing.svg" alt="定位到当前播放歌曲" />
+        <button
+          id="scrollToPlayingBtn"
+          title="定位到当前播放歌曲"
+          aria-label="定位到当前播放歌曲"
+        >
+          <img src="now-playing.svg" alt="定位到当前播放歌曲" />
         </button>
         <button id="scrollTopBtn" title="回到顶部" aria-label="回到顶部">
-          <img src="icons/arrow-up.svg" alt="回到顶部" />
+          <img src="arrow-up.svg" alt="回到顶部" />
         </button>
       </div>
       <!-- 右侧播放器 -->
@@ -48,21 +53,21 @@
         </div>
         <div class="controls">
           <button id="prevBtn" title="上一曲">
-            <img src="icons/previous.svg" alt="上一曲" />
+            <img src="previous.svg" alt="上一曲" />
           </button>
           <button id="playBtn" title="播放/暂停">
-            <img id="playPauseIcon" src="icons/play.svg" alt="播放" />
+            <img id="playPauseIcon" src="play.svg" alt="播放" />
           </button>
           <button id="nextBtn" title="下一曲">
-            <img src="icons/next.svg" alt="下一曲" />
+            <img src="next.svg" alt="下一曲" />
           </button>
           <button id="loopBtn" title="循环模式">
-            <img id="loopIcon" src="icons/loop-list.svg" alt="循环" />
+            <img id="loopIcon" src="loop-list.svg" alt="循环" />
             <span id="loopText">全部</span>
           </button>
           <div class="volume-container">
             <button id="muteBtn" title="静音">
-              <img id="muteIcon" src="icons/volume.svg" alt="音量" />
+              <img id="muteIcon" src="volume.svg" alt="音量" />
             </button>
             <input
               type="range"
@@ -79,6 +84,7 @@
       </div>
     </div>
 
+    <!-- JavaScript引入 - 按依赖顺序加载 -->
     <script src="main.js"></script>
   </body>
 </html>

@@ -7,7 +7,7 @@ from os import _exit
 from threading import Thread
 
 # 启动后端
-server_thread = Thread(target=server.start, daemon=True) # type: ignore
+server_thread = Thread(target=server.start, daemon=True)  # type: ignore
 server_thread.start()
 # 启动前端
 main_window = webview.create_window(
@@ -17,7 +17,7 @@ main_window = webview.create_window(
     height=720,
     resizable=True,
     text_select=False,
-    easy_drag=True
+    easy_drag=True,
 )
 webview.start(icon="assets/icon.ico", http_server=False)
 # 如果前端退出，则后端强制退出

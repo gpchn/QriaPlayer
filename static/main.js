@@ -7,6 +7,8 @@ class Player {
     this.lyrics = [];
     this.lyricsTimer = null;
     this.loopMode = 2; // 0:无, 1:单曲, 2:列表, 3:随机
+    this.isUserScrollingLyrics = false; // 新增：标记用户是否正在滚动歌词
+    this.userScrollingTimeout = null; // 新增：用户滚动超时定时器
     this.initEvents();
   }
 
@@ -75,6 +77,30 @@ class Player {
       li.onclick = () => this.playAt(this.playlist.indexOf(item));
       ul.appendChild(li);
     });
+
+    // 触发检查当前播放歌曲是否在可视区域内
+    this.updateScrollToPlayingButton();
+  }
+
+  updateScrollToPlayingButton() {
+    const playlistContainer = document.querySelector(".playlist-container");
+    const scrollToPlayingBtn = document.getElementById("scrollToPlayingBtn");
+    if (!playlistContainer || !scrollToPlayingBtn) return;
+
+    const playingElement = document.querySelector("#playlist li.playing");
+    if (playingElement && this.currentIndex >= 0) {
+      const playlistRect = playlistContainer.getBoundingClientRect();
+      const playingRect = playingElement.getBoundingClientRect();
+
+      // 当前播放歌曲不在可视区域内时显示按钮
+      if (playingRect.top < playlistRect.top || playingRect.bottom > playlistRect.bottom) {
+        scrollToPlayingBtn.classList.add("show");
+      } else {
+        scrollToPlayingBtn.classList.remove("show");
+      }
+    } else {
+      scrollToPlayingBtn.classList.remove("show");
+    }
   }
 
   async playByName(filename) {
@@ -105,6 +131,9 @@ class Player {
       alert("当前为视频项，请在支持的视频播放器中播放。");
     }
     this.renderPlaylist(document.getElementById("searchBox").value);
+
+    // 更新返回当前播放歌曲按钮状态
+    setTimeout(() => this.updateScrollToPlayingButton(), 300); // 延迟一点执行，确保DOM已更新
   }
 
   async loadLyrics(filename) {
@@ -167,7 +196,8 @@ class Player {
       )
       .join("");
     // 歌词垂直居中：将当前歌词的中心与歌词框的中心对齐
-    if (idx !== -1) {
+    // 只有当用户没有正在滚动歌词时才自动滚动
+    if (idx !== -1 && !this.isUserScrollingLyrics) {
       const active = box.children[idx];
       if (active) {
         const boxRect = box.getBoundingClientRect();
@@ -242,6 +272,9 @@ class Player {
 
   setVolume(val) {
     this.audio.volume = val;
+    // 更新滑块颜色
+    const volumeSlider = document.getElementById("volumeSlider");
+    volumeSlider.style.setProperty('--volume-percent', val * 100 + '%');
   }
 
   seek(val) {
@@ -262,35 +295,92 @@ class Player {
     document.getElementById("searchBox").addEventListener("input", (e) => {
       this.renderPlaylist(e.target.value);
     });
-    // 回到顶部按钮逻辑
+
+    // 歌词滚动检测
+    const lyricsBox = document.getElementById("lyricsBox");
+    lyricsBox.addEventListener("scroll", () => {
+      // 用户开始滚动歌词
+      this.isUserScrollingLyrics = true;
+
+      // 清除之前的超时器
+      if (this.userScrollingTimeout) {
+        clearTimeout(this.userScrollingTimeout);
+      }
+
+      // 设置新的超时器：用户停止滚动1.5秒后，恢复自动滚动
+      this.userScrollingTimeout = setTimeout(() => {
+        this.isUserScrollingLyrics = false;
+      }, 1500);
+    });
+
+    // 歌词滚动条mousedown和mouseup事件监听
+    lyricsBox.addEventListener("mousedown", () => {
+      this.isUserScrollingLyrics = true;
+    });
+
+    document.addEventListener("mouseup", () => {
+      // 设置超时器：鼠标释放后0.8秒恢复自动滚动
+      if (this.userScrollingTimeout) {
+        clearTimeout(this.userScrollingTimeout);
+      }
+      this.userScrollingTimeout = setTimeout(() => {
+        this.isUserScrollingLyrics = false;
+      }, 800);
+    });
+
+    // 回到顶部按钮和返回当前播放歌曲按钮逻辑
     const playlistContainer = document.querySelector(".playlist-container");
     const scrollTopBtn = document.getElementById("scrollTopBtn");
-    function updateScrollTopBtnPos() {
+    const scrollToPlayingBtn = document.getElementById("scrollToPlayingBtn");
+
+    function updateScrollButtonsPos() {
       const rect = playlistContainer.getBoundingClientRect();
       scrollTopBtn.style.right = window.innerWidth - rect.right + 16 + "px";
       scrollTopBtn.style.bottom = window.innerHeight - rect.bottom + 24 + "px";
+      scrollToPlayingBtn.style.right = window.innerWidth - rect.right + 16 + "px";
+      scrollToPlayingBtn.style.bottom = window.innerHeight - rect.bottom + 76 + "px"; // 在顶部按钮上方
     }
-    window.addEventListener("resize", updateScrollTopBtnPos);
-    window.addEventListener("scroll", updateScrollTopBtnPos);
-    updateScrollTopBtnPos();
+
+    window.addEventListener("resize", updateScrollButtonsPos);
+    window.addEventListener("scroll", updateScrollButtonsPos);
+    updateScrollButtonsPos();
+
     playlistContainer.addEventListener("scroll", () => {
+      // 回到顶部按钮显示逻辑
       if (playlistContainer.scrollTop > 120) {
         scrollTopBtn.classList.add("show");
       } else {
         scrollTopBtn.classList.remove("show");
       }
+
+      // 返回到当前播放歌曲按钮显示逻辑
+      player.updateScrollToPlayingButton();
     });
+
     scrollTopBtn.onclick = () => {
       playlistContainer.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    scrollToPlayingBtn.onclick = () => {
+      const playingElement = document.querySelector("#playlist li.playing");
+      if (playingElement) {
+        playingElement.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
     };
     // 进度条
     document.getElementById("progressBar").addEventListener("input", (e) => {
       this.seek(e.target.value);
     });
     // 音量
-    document.getElementById("volumeSlider").addEventListener("input", (e) => {
-      this.setVolume(e.target.value);
+    const volumeSlider = document.getElementById("volumeSlider");
+    volumeSlider.addEventListener("input", (e) => {
+      const value = e.target.value;
+      this.setVolume(value);
+      // 更新滑块颜色
+      volumeSlider.style.setProperty('--volume-percent', value * 100 + '%');
     });
+    // 初始设置滑块颜色
+    volumeSlider.style.setProperty('--volume-percent', '100%');
     // 控制按钮
     document.getElementById("playBtn").onclick = () => this.togglePlay();
     document.getElementById("prevBtn").onclick = () => this.playPrev();
@@ -308,6 +398,10 @@ class Player {
       document.getElementById("currentTime").textContent = this.formatTime(cur);
       document.getElementById("duration").textContent = this.formatTime(dur);
       this.updateLyrics(cur);
+      // 定期检查当前播放歌曲是否在可视区域内
+      if (cur % 2 < 0.1) { // 每2秒检查一次，避免频繁检查
+        this.updateScrollToPlayingButton();
+      }
       // 播放/暂停图标切换
       const playPauseIcon = document.getElementById("playPauseIcon");
       if (this.audio.paused) {
@@ -325,7 +419,11 @@ class Player {
         this.playAt(Math.floor(Math.random() * this.playlist.length));
     });
     this.audio.addEventListener("volumechange", () => {
-      document.getElementById("volumeSlider").value = this.audio.volume;
+      const volumeSlider = document.getElementById("volumeSlider");
+      volumeSlider.value = this.audio.volume;
+      // 更新滑块颜色
+      volumeSlider.style.setProperty('--volume-percent', this.audio.volume * 100 + '%');
+
       const muteIcon = document.getElementById("muteIcon");
       if (this.audio.muted || this.audio.volume === 0) {
         muteIcon.src = "icons/mute.svg";

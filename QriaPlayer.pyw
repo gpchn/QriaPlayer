@@ -26,11 +26,11 @@ main_window = webview.create_window(
     height=720,  # 初始窗口高度
     resizable=True,  # 允许调整窗口大小
     text_select=False,  # 禁用文本选择
-    easy_drag=True,  # 启用窗口拖动
+    js_api=server,  # 将后端服务器对象传递给前端，允许前端调用后端API
 )
 
 # 启动PyWebView，这将阻塞主线程直到窗口关闭
-webview.start(icon="assets/icon.ico", http_server=False)
+webview.start(icon="static/favicon.ico", http_server=False)
 
 # 当窗口关闭后，强制退出所有线程以确保应用完全关闭
 # 使用_exit而不是sys.exit确保所有线程立即终止

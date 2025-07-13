@@ -116,7 +116,7 @@ QriaPlayer 依赖于以下主要 Python 库：
 
 - **fastapi** (>=0.115.13)：高性能 Web 框架
 - **uvicorn** (>=0.34.3)：ASGI 服务器
-- **pywebview** (>=5.4)：将 Web 内容嵌入到桌面应用的库
+- **pywebview** (>=5.4)：将 Web 内容嵌入到桌面应用
 - **bilibili-api-python** (>=17.2.1)：B 站 API 接口
 - **httpx** (>=0.28.1)：现代化的 HTTP 客户端
 - **pyffmpeg** (>=2.4.3)：Python 的 FFmpeg 封装

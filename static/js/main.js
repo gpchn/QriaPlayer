@@ -427,7 +427,7 @@ class Player {
       document.querySelector(".controls").style.visibility = "hidden";
 
       // 添加logo图标到歌词区域
-      lyricsBox.innerHTML = '<div class="welcome-icon"><img src="/static/favicon.ico" alt="QriaPlayer"></div>';
+      lyricsBox.innerHTML = '<div class="welcome-icon"><div class="icon-background"></div><img src="/static/favicon.ico" alt="QriaPlayer"></div>';
 
       // 添加欢迎文字
       document.getElementById("songTitle").textContent = "欢迎使用 QriaPlayer";
@@ -437,6 +437,27 @@ class Player {
       const style = document.createElement("style");
       style.id = "welcome-style";
       style.textContent = `
+        /* 欢迎图标样式 */
+        .welcome-icon {
+          position: relative;
+        }
+
+        .icon-background {
+          position: absolute;
+          width: 240px;
+          height: 240px;
+          background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 60%, transparent 100%);
+          border-radius: 50%;
+          filter: blur(10px);
+          animation: pulse-bg 10s infinite cubic-bezier(0.45, 0.05, 0.55, 0.95);
+        }
+
+        @keyframes pulse-bg {
+          0% { transform: scale(1); opacity: 0.4; }
+          50% { transform: scale(1.6); opacity: 0.45; }
+          100% { transform: scale(1); opacity: 0.4; }
+        }
+
         .welcome-icon {
           display: flex;
           justify-content: center;
@@ -446,13 +467,15 @@ class Player {
         .welcome-icon img {
           width: 180px;
           height: 180px;
-          opacity: 0.7;
-          animation: pulse 2s infinite ease-in-out;
+          opacity: 0.85;
+          filter: brightness(1.2);
+          animation: pulse-icon 10s infinite ease-in-out;
         }
-        @keyframes pulse {
-          0% { transform: scale(1); }
-          50% { transform: scale(1.05); }
-          100% { transform: scale(1); }
+
+        @keyframes pulse-icon {
+          0% { transform: scale(1); opacity: 0.85; }
+          50% { transform: scale(1.05); opacity: 0.9; }
+          100% { transform: scale(1); opacity: 0.85; }
         }
       `;
       document.head.appendChild(style);

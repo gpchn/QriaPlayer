@@ -30,7 +30,7 @@ main_window = webview.create_window(
 )
 
 # 启动PyWebView，这将阻塞主线程直到窗口关闭
-webview.start(icon="static/favicon.ico", http_server=False)
+webview.start(icon="static/favQriaPlayer.ico", http_server=False)
 
 # 当窗口关闭后，强制退出所有线程以确保应用完全关闭
 # 使用_exit而不是sys.exit确保所有线程立即终止

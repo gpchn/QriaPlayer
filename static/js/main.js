@@ -433,62 +433,20 @@ class Player {
       document.getElementById("songTitle").textContent = "欢迎使用 QriaPlayer";
       document.getElementById("songArtist").textContent = "请从左侧列表选择一首歌曲开始播放";
 
-      // 添加样式到图标
+      // 创建welcome-style元素来标记欢迎状态
       const style = document.createElement("style");
       style.id = "welcome-style";
-      style.textContent = `
-        /* 欢迎图标样式 */
-        .welcome-icon {
-          position: relative;
-        }
-
-        .icon-background {
-          position: absolute;
-          width: 240px;
-          height: 240px;
-          background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 60%, transparent 100%);
-          border-radius: 50%;
-          filter: blur(10px);
-          animation: pulse-bg 10s infinite cubic-bezier(0.45, 0.05, 0.55, 0.95);
-        }
-
-        @keyframes pulse-bg {
-          0% { transform: scale(1); opacity: 0.4; }
-          50% { transform: scale(1.6); opacity: 0.45; }
-          100% { transform: scale(1); opacity: 0.4; }
-        }
-
-        .welcome-icon {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          height: 100%;
-        }
-        .welcome-icon img {
-          width: 180px;
-          height: 180px;
-          opacity: 0.85;
-          filter: brightness(1.2);
-          animation: pulse-icon 10s infinite ease-in-out;
-        }
-
-        @keyframes pulse-icon {
-          0% { transform: scale(1); opacity: 0.85; }
-          50% { transform: scale(1.05); opacity: 0.9; }
-          100% { transform: scale(1); opacity: 0.85; }
-        }
-      `;
       document.head.appendChild(style);
     }
   }
 
   initEvents() {
-    // 定期保存播放状态（每30秒）
+    // 定期保存播放状态（每5秒）
     setInterval(() => {
       if (this.currentIndex !== -1) {
         this.savePlayState();
       }
-    }, 30000);
+    }, 5000);
 
     // 页面关闭时保存状态
     window.addEventListener('beforeunload', () => {

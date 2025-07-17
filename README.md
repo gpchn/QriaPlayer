@@ -7,7 +7,7 @@
 
 一个简洁美观的跨平台音乐播放器，支持音乐和视频播放，带有实时歌词显示和B站视频下载功能。
 
-![QriaPlayer Logo](QriaPlayer.ico)
+![QriaPlayer Logo](QriaPlayerIcon/QiraPlayer_256.png)
 
 ## 目录
 

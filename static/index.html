@@ -30,10 +30,10 @@
         </button>
       </div>
       <!-- 右侧播放器 -->
-      <div class="player-container">
-        <div class="song-info">
-          <h2 id="songTitle">- 请选取一首歌播放 -</h2>
-          <p id="songArtist">-</p>
+      <div class="music-player-container" id="musicPlayerContainer">
+        <div class="info">
+          <h2 id="songTitle"></h2>
+          <p id="songArtist"></p>
         </div>
         <div class="lyrics-container" id="lyricsBox"></div>
         <div class="progress-container">
@@ -85,10 +85,19 @@
           </div>
         </div>
       </div>
+      <div class="video-player-container" id="videoPlayerContainer">
+        <div class="info">
+          <h2 id="videoTitle"></h2>
+          <p id="videoArtist"></p>
+        </div>
+        <video class="video-player" id="videoPlayer" controls></video>
+      </div>
+      <div class="welcome-container" id="welcomeContainer">
+        <img src="/static/QriaPlayer.svg" alt="QriaPlayer" class="welcome-icon" />
+      </div>
     </div>
 
     <!-- JavaScript引入 - 按依赖顺序加载 -->
     <script src="/static/js/main.js"></script>
   </body>
 </html>
-

@@ -11,7 +11,6 @@ class Player {
     this.userScrollingTimeout = null; // 用户滚动超时定时器
     this.hasPlayed = false; // 标记用户是否已开始播放
     this.initEvents();
-    this.updateInitialDisplay(); // 初始化显示状态
   }
 
   // 检查并恢复保存的播放状态
@@ -59,14 +58,24 @@ class Player {
     if (this.currentIndex === -1) return;
 
     const currentItem = this.playlist[this.currentIndex];
-    // 只保存音乐类型的播放状态
-    if (currentItem && currentItem.type === "music") {
-      const state = {
+    // 保存音乐和视频的播放状态
+    if (currentItem) {
+      let state = {
         filename: currentItem.filename,
-        current_time: this.audio.currentTime || 0,
+        current_time: 0,
+        type: currentItem.type,
       };
 
+      // 根据媒体类型获取当前播放时间
+      if (currentItem.type === "music") {
+        state.current_time = this.audio.currentTime || 0;
+      } else if (currentItem.type === "video") {
+        const videoPlayer = document.getElementById("videoPlayer");
+        state.current_time = videoPlayer.currentTime || 0;
+      }
+
       try {
+        console.log("保存播放状态:", state);
         await fetch("/api/play_state", {
           method: "POST",
           headers: {
@@ -84,36 +93,42 @@ class Player {
   async restorePlayState(state) {
     // 如果播放列表已加载且有保存的文件名
     if (this.playlist.length > 0 && state.filename) {
-      // 查找对应的歌曲索引
+      // 查找对应的媒体索引
       const idx = this.playlist.findIndex(
         (item) => item.filename === state.filename
       );
       if (idx !== -1) {
         console.log("恢复播放状态:", state);
 
-        // 设置hasPlayed为true，因为我们要恢复之前的播放
+        // 设置 hasPlayed 为 true，因为我们要恢复之前的播放
         this.hasPlayed = true;
 
-        // 显示控制组件
-        document.querySelector(".progress-container").style.visibility =
-          "visible";
-        document.querySelector(".controls").style.visibility = "visible";
-
         // 移除欢迎样式
-        const welcomeStyle = document.getElementById("welcome-style");
-        if (welcomeStyle) welcomeStyle.remove();
+        document.getElementById("welcomeContainer").style.display = "none";
 
+        // 播放对应的媒体
         await this.playAt(idx);
 
-        // 设置播放进度
+        // 根据媒体类型设置播放进度
         if (state.current_time > 0) {
-          this.audio.currentTime = state.current_time;
-        }
+          const mediaType = state.type || this.playlist[idx].type;
 
-        // 总是暂停在恢复的位置，不自动播放
-        this.audio.pause();
-        document.getElementById("playPauseIcon").src = "/static/icons/play.svg";
-        document.getElementById("playPauseIcon").alt = "播放";
+          if (mediaType === "music") {
+            // 设置音频播放进度
+            this.audio.currentTime = state.current_time;
+            // 总是暂停在恢复的位置，不自动播放
+            this.audio.pause();
+            document.getElementById("playPauseIcon").src =
+              "/static/icons/play.svg";
+            document.getElementById("playPauseIcon").alt = "播放";
+          } else if (mediaType === "video") {
+            // 设置视频播放进度
+            const videoPlayer = document.getElementById("videoPlayer");
+            videoPlayer.currentTime = state.current_time;
+            // 总是暂停在恢复的位置，不自动播放
+            videoPlayer.pause();
+          }
+        }
       }
     }
   }
@@ -195,35 +210,46 @@ class Player {
     if (!this.hasPlayed) {
       // 设置标志，表示已经开始播放
       this.hasPlayed = true;
-
-      // 显示控制组件
-      document.querySelector(".progress-container").style.visibility =
-        "visible";
-      document.querySelector(".controls").style.visibility = "visible";
-
       // 移除欢迎样式
-      const welcomeStyle = document.getElementById("welcome-style");
-      if (welcomeStyle) welcomeStyle.remove();
+      document.getElementById("welcomeContainer").style.display = "none";
     }
 
     this.currentIndex = idx;
     const item = this.playlist[idx];
 
-    document.getElementById("songTitle").textContent = item.title;
-    document.getElementById("songArtist").textContent = item.artist;
-
     if (item.type === "music") {
+      // 显示歌曲信息
+      document.getElementById("songTitle").textContent = item.title;
+      document.getElementById("songArtist").textContent = item.artist;
+      // 显示控制组件
+      document.getElementById("musicPlayerContainer").style.display = "flex";
+      // 显示控制组件
+      document.getElementById("videoPlayerContainer").style.display = "none";
+      // 暂停视频
+      document.getElementById("videoPlayer").pause();
+
       // 音频
       this.audio.src = `/media/music/${item.filename}`;
       this.audio.play();
       // 歌词
       this.loadLyrics(item.filename);
     } else if (item.type === "video") {
+      // 显示视频信息
+      document.getElementById("videoTitle").textContent = item.title;
+      document.getElementById("videoArtist").textContent = item.artist;
+      // 显示控制组件
+      document.getElementById("musicPlayerContainer").style.display = "none";
+      // 显示控制组件
+      document.getElementById("videoPlayerContainer").style.display = "block";
+      // 暂停音乐
       this.audio.pause();
-      this.audio.src = "";
-      this.lyrics = [];
-      this.updateLyrics(0);
-      // todo: 内置视频播放器
+
+      player = document.getElementById("videoPlayer");
+      player.src = `/media/video/${item.filename}`;
+      player.play();
+    } else {
+      console.error("未知媒体类型:", item.type);
+      return;
     }
     this.renderPlaylist(document.getElementById("searchBox").value);
 
@@ -388,43 +414,42 @@ class Player {
     return `${m}:${s.toString().padStart(2, "0")}`;
   }
 
-  updateInitialDisplay() {
-    // 初始化显示状态：在未播放前显示大图标
-    if (!this.hasPlayed) {
-      const lyricsBox = document.getElementById("lyricsBox");
-      const playerContainer = document.querySelector(".player-container");
-
-      // 隐藏控制组件
-      document.querySelector(".progress-container").style.visibility = "hidden";
-      document.querySelector(".controls").style.visibility = "hidden";
-
-      // 添加logo图标到歌词区域
-      lyricsBox.innerHTML =
-        '<div class="welcome-icon"><div class="icon-background"></div><img src="/static/favicon.ico" alt="QriaPlayer"></div>';
-
-      // 添加欢迎文字
-      document.getElementById("songTitle").textContent = "欢迎使用 QriaPlayer";
-      document.getElementById("songArtist").textContent =
-        "请从左侧列表选择一首歌曲开始播放";
-
-      // 创建 welcome-style 元素来标记欢迎状态
-      const style = document.createElement("style");
-      style.id = "welcome-style";
-      document.head.appendChild(style);
-    }
-  }
-
   initEvents() {
-    // 定期保存播放状态（每5秒）
+    // 定期保存播放状态（每 30 秒）
     setInterval(() => {
       if (this.currentIndex !== -1) {
         this.savePlayState();
       }
-    }, 5000);
+    }, 30000);
 
     // 页面关闭时保存状态
     window.addEventListener("beforeunload", () => {
       this.savePlayState();
+    });
+
+    // 为视频播放器添加事件监听
+    const videoPlayer = document.getElementById("videoPlayer");
+
+    // 视频暂停时保存状态
+    videoPlayer.addEventListener("pause", () => {
+      if (
+        this.currentIndex !== -1 &&
+        this.playlist[this.currentIndex].type === "video"
+      ) {
+        console.log("视频暂停，保存播放状态");
+        this.savePlayState();
+      }
+    });
+
+    // 视频播放结束时保存状态
+    videoPlayer.addEventListener("ended", () => {
+      if (
+        this.currentIndex !== -1 &&
+        this.playlist[this.currentIndex].type === "video"
+      ) {
+        console.log("视频结束，保存播放状态");
+        this.savePlayState();
+      }
     });
 
     // 搜索
@@ -492,7 +517,7 @@ class Player {
       }
 
       // 返回到当前播放歌曲按钮显示逻辑
-      player.updateScrollToPlayingButton();
+      this.updateScrollToPlayingButton();
     });
 
     scrollTopBtn.onclick = () => {

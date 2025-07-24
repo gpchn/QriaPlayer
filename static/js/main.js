@@ -29,7 +29,11 @@ class Player {
 
       // 如果有保存的文件名，等待播放列表加载完成后恢复
       if (state.filename) {
-        console.log("发现保存的文件名:", state.filename, "将在播放列表加载完成后恢复");
+        console.log(
+          "发现保存的文件名:",
+          state.filename,
+          "将在播放列表加载完成后恢复"
+        );
         // 延长等待时间，确保播放列表完全加载
         setTimeout(async () => {
           if (this.playlist.length > 0) {
@@ -81,7 +85,9 @@ class Player {
     // 如果播放列表已加载且有保存的文件名
     if (this.playlist.length > 0 && state.filename) {
       // 查找对应的歌曲索引
-      const idx = this.playlist.findIndex(item => item.filename === state.filename);
+      const idx = this.playlist.findIndex(
+        (item) => item.filename === state.filename
+      );
       if (idx !== -1) {
         console.log("恢复播放状态:", state);
 
@@ -89,7 +95,8 @@ class Player {
         this.hasPlayed = true;
 
         // 显示控制组件
-        document.querySelector(".progress-container").style.visibility = "visible";
+        document.querySelector(".progress-container").style.visibility =
+          "visible";
         document.querySelector(".controls").style.visibility = "visible";
 
         // 移除欢迎样式
@@ -112,41 +119,10 @@ class Player {
   }
 
   async loadPlaylist() {
-    // 获取歌曲列表
-    const musicRes = await fetch("/api/music_list");
-    const { music_list } = await musicRes.json();
-    // 获取视频列表
-    const videoRes = await fetch("/api/video_list");
-    const { video_list } = await videoRes.json();
-
-    // 歌曲格式化
-    const musicItems = music_list.map((item) => {
-      // item: "[歌名] - [歌手]"
-      const [title, artist] = item.replace(".mp3", "").split(" - ");
-      return {
-        type: "music",
-        filename: item,
-        title: title || item.replace(".mp3", ""),
-        artist: artist || "未知艺术家",
-      };
-    });
-
-    // 视频格式化
-    const videoItems = video_list.map((item) => {
-      // item: "[视频名] - [作者]"
-      const [title, artist] = item
-        .replace(/\.(mp4|webm|ogg)$/i, "")
-        .split(" - ");
-      return {
-        type: "video",
-        filename: item,
-        title: title || item,
-        artist: artist || "未知作者",
-      };
-    });
-
-    // 合并播放列表
-    this.playlist = [...musicItems, ...videoItems];
+    // 获取播放列表
+    const res = await fetch("/api/playlist");
+    const { playlist } = await res.json();
+    this.playlist = playlist;
     this.renderPlaylist();
 
     // 播放列表加载完成后，尝试恢复播放状态
@@ -172,9 +148,7 @@ class Player {
         li.classList.add("video-item");
       }
       li.innerHTML = `
-        <div class="song-name">${item.title}${
-        item.type === "video" ? ' <span class="video-tag">[视频]</span>' : ""
-      }</div>
+        <div class="song-name">${item.title}</div>
         <div class="song-artist">${item.artist}</div>
       `;
       li.onclick = () => this.playAt(this.playlist.indexOf(item));
@@ -223,7 +197,8 @@ class Player {
       this.hasPlayed = true;
 
       // 显示控制组件
-      document.querySelector(".progress-container").style.visibility = "visible";
+      document.querySelector(".progress-container").style.visibility =
+        "visible";
       document.querySelector(".controls").style.visibility = "visible";
 
       // 移除欢迎样式
@@ -237,24 +212,23 @@ class Player {
     document.getElementById("songTitle").textContent = item.title;
     document.getElementById("songArtist").textContent = item.artist;
 
-  if (item.type === "music") {
+    if (item.type === "music") {
       // 音频
       this.audio.src = `/media/music/${item.filename}`;
       this.audio.play();
       // 歌词
       this.loadLyrics(item.filename);
     } else if (item.type === "video") {
-      // 视频项：这里只做提示，实际可扩展为弹窗或切换video标签
       this.audio.pause();
       this.audio.src = "";
       this.lyrics = [];
       this.updateLyrics(0);
-      alert("当前为视频项，请在支持的视频播放器中播放。");
+      // todo: 内置视频播放器
     }
     this.renderPlaylist(document.getElementById("searchBox").value);
 
     // 更新返回当前播放歌曲按钮状态
-    setTimeout(() => this.updateScrollToPlayingButton(), 300); // 延迟一点执行，确保DOM已更新
+    setTimeout(() => this.updateScrollToPlayingButton(), 300); // 延迟一点执行，确保 DOM 已更新
   }
 
   async loadLyrics(filename) {
@@ -332,8 +306,6 @@ class Player {
       }
     }
   }
-
-
 
   playPrev() {
     if (this.loopMode === 3) {
@@ -427,13 +399,15 @@ class Player {
       document.querySelector(".controls").style.visibility = "hidden";
 
       // 添加logo图标到歌词区域
-      lyricsBox.innerHTML = '<div class="welcome-icon"><div class="icon-background"></div><img src="/static/favicon.ico" alt="QriaPlayer"></div>';
+      lyricsBox.innerHTML =
+        '<div class="welcome-icon"><div class="icon-background"></div><img src="/static/favicon.ico" alt="QriaPlayer"></div>';
 
       // 添加欢迎文字
       document.getElementById("songTitle").textContent = "欢迎使用 QriaPlayer";
-      document.getElementById("songArtist").textContent = "请从左侧列表选择一首歌曲开始播放";
+      document.getElementById("songArtist").textContent =
+        "请从左侧列表选择一首歌曲开始播放";
 
-      // 创建welcome-style元素来标记欢迎状态
+      // 创建 welcome-style 元素来标记欢迎状态
       const style = document.createElement("style");
       style.id = "welcome-style";
       document.head.appendChild(style);
@@ -449,7 +423,7 @@ class Player {
     }, 5000);
 
     // 页面关闭时保存状态
-    window.addEventListener('beforeunload', () => {
+    window.addEventListener("beforeunload", () => {
       this.savePlayState();
     });
 
@@ -469,19 +443,19 @@ class Player {
         clearTimeout(this.userScrollingTimeout);
       }
 
-      // 设置新的超时器：用户停止滚动1.5秒后，恢复自动滚动
+      // 设置新的超时器：用户停止滚动 1.5 秒后，恢复自动滚动
       this.userScrollingTimeout = setTimeout(() => {
         this.isUserScrollingLyrics = false;
       }, 1500);
     });
 
-    // 歌词滚动条mousedown和mouseup事件监听
+    // 歌词滚动条 mousedown 和 mouseup 事件监听
     lyricsBox.addEventListener("mousedown", () => {
       this.isUserScrollingLyrics = true;
     });
 
     document.addEventListener("mouseup", () => {
-      // 设置超时器：鼠标释放后0.8秒恢复自动滚动
+      // 设置超时器：鼠标释放后 0.8 秒恢复自动滚动
       if (this.userScrollingTimeout) {
         clearTimeout(this.userScrollingTimeout);
       }
@@ -564,7 +538,7 @@ class Player {
       this.updateLyrics(cur);
       // 定期检查当前播放歌曲是否在可视区域内
       if (cur % 2 < 0.1) {
-        // 每2秒检查一次，避免频繁检查
+        // 每 2 秒检查一次，避免频繁检查
         this.updateScrollToPlayingButton();
       }
       // 播放/暂停图标切换

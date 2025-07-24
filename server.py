@@ -15,12 +15,13 @@ QriaPlayer 后端服务器
 - GET /api/get_lrc/{filename} - 获取指定歌词文件
 """
 
-import orjson
+import json
+import bottle
 from pathlib import Path
-from bottle import Bottle, static_file, request, response, run
+from waitress import serve
 
 # 创建Bottle应用
-app: Bottle = Bottle()
+app: bottle.Bottle = bottle.Bottle()
 
 
 # 数据模型定义
@@ -35,7 +36,7 @@ class PlayState:
         return {"filename": self.filename, "current_time": self.current_time}
 
     def to_json(self) -> str:
-        return orjson.dumps(self.to_dict()).decode()
+        return json.dumps(self.to_dict())
 
     @classmethod
     def from_dict(cls, data) -> "PlayState":
@@ -64,7 +65,7 @@ play_state = PlayState()  # 默认播放状态
 # 如果状态文件存在，加载之前的播放状态
 if state_file.exists():
     try:
-        saved_state = orjson.loads(state_file.read_text(encoding="utf-8"))
+        saved_state = json.loads(state_file.read_text(encoding="utf-8"))
         play_state = PlayState.from_dict(saved_state)
     except Exception as e:
         print(f"加载播放状态失败: {e}")
@@ -74,57 +75,72 @@ if state_file.exists():
 @app.route("/")  # type: ignore
 def route_index():
     """提供主页HTML文件"""
-    return static_file("index.html", root=str(static))
+    return bottle.static_file("index.html", root=str(static))
 
 
 @app.route("/favicon.ico")  # type: ignore
 def route_favicon():
     """提供网站图标"""
-    return static_file("favicon.ico", root=str(static))
+    return bottle.static_file("favicon.ico", root=str(static))
 
 
 # 静态文件路由
 @app.route("/static/<filepath:path>")  # type: ignore
 def serve_static(filepath):
     """提供静态文件"""
-    return static_file(filepath, root=str(static))
+    return bottle.static_file(filepath, root=str(static))
 
 
 # 媒体文件路由
 @app.route("/media/music/<filepath:path>")  # type: ignore
 def serve_music(filepath):
     """提供音乐文件"""
-    return static_file(filepath, root=str(musics))
+    return bottle.static_file(filepath, root=str(musics))
 
 
 @app.route("/media/video/<filepath:path>")  # type: ignore
 def serve_video(filepath):
     """提供视频文件"""
-    return static_file(filepath, root=str(videos))
+    return bottle.static_file(filepath, root=str(videos))
 
 
-@app.get("/api/music_list")  # type: ignore
-def route_music_list() -> str:
+@app.get("/api/playlist")  # type: ignore
+def route_playlist() -> str:
     """
-    获取音乐文件列表
+    获取统一播放列表（包含音乐和视频）
 
     Returns:
-        dict: 包含所有 MP3 文件名的 JSON 响应
+        dict: 包含混合媒体条目的 JSON 响应
     """
-    response.content_type = "application/json"
-    return orjson.dumps({"music_list": music_list}).decode()
 
+    def _parse_media(filename: str, media_type: str):
+        """解析媒体文件名公共方法"""
+        if media_type == "music":
+            base_name = filename.replace(".mp3", "")
+        else:  # video
+            base_name = filename.replace(".mp4", "")
+        parts = base_name.split(" - ")
+        return {
+            "type": media_type,
+            "filename": filename,
+            "title": parts[0] if len(parts) > 1 else base_name,
+            "artist": (
+                parts[1]
+                if len(parts) > 1
+                else "未知艺术家" if media_type == "music" else "未知作者"
+            ),
+        }
 
-@app.get("/api/video_list")  # type: ignore
-def route_video_list() -> str:
-    """
-    获取视频文件列表
+    # 合并并解析媒体列表
+    media_list = [_parse_media(f.name, "music") for f in musics.glob("*.mp3")] + [
+        _parse_media(f.name, "video") for f in videos.glob("*.mp4")
+    ]
 
-    Returns:
-        dict: 包含所有MP4文件名的JSON响应
-    """
-    response.content_type = "application/json"
-    return orjson.dumps({"video_list": video_list}).decode()
+    # 按标题排序（可选）
+    media_list.sort(key=lambda x: x["title"])
+
+    bottle.response.content_type = "application/json"
+    return json.dumps({"playlist": media_list})
 
 
 @app.get("/api/get_lrc/<filename>")  # type: ignore
@@ -140,12 +156,12 @@ def route_get_lrc(filename: str) -> str:
     """
     lrc_path = lyrics / filename
     if not lrc_path.exists():
-        response.content_type = "application/json"
-        return orjson.dumps({"lyrics": ""}).decode()
+        bottle.response.content_type = "application/json"
+        return json.dumps({"lyrics": ""})
 
     content = lrc_path.read_text(encoding="utf-8")
-    response.content_type = "application/json"
-    return orjson.dumps({"lyrics": content}).decode()
+    bottle.response.content_type = "application/json"
+    return json.dumps({"lyrics": content})
 
 
 @app.get("/api/play_state")  # type: ignore
@@ -156,7 +172,7 @@ def get_play_state() -> str:
     Returns:
         dict: 包含当前播放状态的 JSON 响应
     """
-    response.content_type = "application/json"
+    bottle.response.content_type = "application/json"
     return play_state.to_json()
 
 
@@ -170,21 +186,17 @@ def save_play_state() -> str:
     """
     global play_state
     try:
-        data = request.json
+        data = bottle.request.json
         play_state = PlayState.from_dict(data)
 
         # 将状态保存到文件
-        state_file.write_bytes(orjson.dumps(play_state.to_dict()))
-        response.content_type = "application/json"
-        return orjson.dumps(
-            {"status": "success", "message": "播放状态保存成功"}
-        ).decode()
+        state_file.write_text(json.dumps(play_state.to_dict()), "utf-8")
+        bottle.response.content_type = "application/json"
+        return json.dumps({"status": "success", "message": "播放状态保存成功"})
     except Exception as e:
-        response.status = 500
-        response.content_type = "application/json"
-        return orjson.dumps(
-            {"status": "error", "message": f"播放状态保存失败: {str(e)}"}
-        ).decode()
+        bottle.response.status = 500
+        bottle.response.content_type = "application/json"
+        return json.dumps({"status": "error", "message": f"播放状态保存失败: {str(e)}"})
 
 
 def start():
@@ -193,4 +205,4 @@ def start():
 
     在 localhost:41004 上运行 Bottle 应用
     """
-    run(app, host="localhost", port=41004)
+    serve(app, host="localhost", port=41004)

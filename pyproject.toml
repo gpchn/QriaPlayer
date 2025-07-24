@@ -1,15 +1,17 @@
 [project]
 name = "QriaPlayer"
-version = "1.0.1"
+version = "1.1.0"
 description = "QriaPlayer"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "bilibili-api-python>=17.2.1",
+    "bilibili-api-python>=17.3.0",
     "httpx>=0.28.1",
-    "orjson>=3.10.18",
+    "pillow>=11.2.1",
     "pyffmpeg>=2.4.3",
+    "pystray>=0.19.5",
     "pywebview>=5.4",
+    "waitress>=3.0.2",
 ]
 
 [[tool.uv.index]]

@@ -173,34 +173,46 @@
   color: #888;
 }
 
+/* 重构按钮样式 - 覆盖main.css中的全局button样式 */
 .action-btn {
-  background: rgba(255, 255, 255, 0.1); /* 半透明背景 */
-  color: white;
+  /* 重置全局按钮样式 */
+  width: auto !important; /* 覆盖固定宽度 */
+  height: auto !important; /* 覆盖固定高度 */
+  border-radius: 8px !important; /* 覆盖圆形样式 */
+
+  /* 基本按钮样式 */
+  display: inline-block !important;
+  padding: 10px 20px !important;
+  margin-top: 15px;
   border: none;
-  border-radius: 8px; /* 与其他元素一致的圆角 */
-  padding: 10px 25px;
-  font-size: 15px;
-  font-weight: 400;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-top: 20px;
-  display: inline-block; /* 横向条状按钮 */
-  min-width: 100px;
+
+  /* 颜色和外观 */
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+
+  /* 文字样式 */
+  font-size: 14px;
+  font-weight: normal;
   text-align: center;
-  white-space: nowrap; /* 防止文字换行 */
-  margin-left: 0; /* 防止左侧出现空白 */
-  margin-right: 0; /* 防止右侧出现空白 */
+  white-space: nowrap;
+
+  /* 交互样式 */
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
 }
 
+/* 悬停效果 - 覆盖全局hover样式 */
 .action-btn:hover {
-  background: #1db954; /* 悬停时使用绿色背景 */
-  color: rgba(0, 0, 0, 0.8); /* 略微透明的黑色文字 */
-  box-shadow: 0 0 10px rgba(29, 185, 84, 0.4); /* 添加发光效果 */
+  background-color: #1db954 !important;
+  color: rgba(0, 0, 0, 0.9) !important;
+  transform: none !important; /* 禁用全局的transform缩放 */
+  box-shadow: 0 0 12px rgba(29, 185, 84, 0.6) !important; /* 添加绿色发光效果 */
 }
 
+/* 禁用状态 */
 .action-btn:disabled {
-  background: #333;
-  color: #666;
+  background-color: #333 !important;
+  color: #666 !important;
   cursor: not-allowed;
 }
 

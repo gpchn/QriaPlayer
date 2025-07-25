@@ -173,16 +173,15 @@
   color: #888;
 }
 
-/* 重构按钮样式 - 覆盖main.css中的全局button样式 */
-.action-btn {
+.import-content button.action-btn {
   /* 重置全局按钮样式 */
-  width: auto !important; /* 覆盖固定宽度 */
-  height: auto !important; /* 覆盖固定高度 */
-  border-radius: 8px !important; /* 覆盖圆形样式 */
+  width: auto;
+  height: auto;
+  border-radius: 8px;
 
   /* 基本按钮样式 */
-  display: inline-block !important;
-  padding: 10px 20px !important;
+  display: inline-block;
+  padding: 10px 20px;
   margin-top: 15px;
   border: none;
 
@@ -198,21 +197,21 @@
 
   /* 交互样式 */
   cursor: pointer;
-  transition: background-color 0.3s, color 0.3s;
+  transition: all 0.3s ease;
 }
 
-/* 悬停效果 - 覆盖全局hover样式 */
-.action-btn:hover {
-  background-color: #1db954 !important;
-  color: rgba(0, 0, 0, 0.9) !important;
-  transform: none !important; /* 禁用全局的transform缩放 */
-  box-shadow: 0 0 12px rgba(29, 185, 84, 0.6) !important; /* 添加绿色发光效果 */
+/* 悬停效果 */
+.import-content button.action-btn:hover {
+  background-color: #1db954;
+  color: rgba(0, 0, 0, 0.9);
+  transform: scale(1.05);
+  box-shadow: 0 0 12px rgba(29, 185, 84, 0.6);
 }
 
 /* 禁用状态 */
-.action-btn:disabled {
-  background-color: #333 !important;
-  color: #666 !important;
+.import-content button.action-btn:disabled {
+  background-color: #333;
+  color: #666;
   cursor: not-allowed;
 }
 

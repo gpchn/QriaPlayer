@@ -551,6 +551,16 @@ class Player {
     document.getElementById("loopBtn").onclick = () => this.toggleLoopMode();
     document.getElementById("muteBtn").onclick = () => this.toggleMute();
 
+    // 功能按钮
+    document.getElementById("settingsBtn").onclick = () => {
+      // todo: 实现设置功能
+      console.log("设置功能待实现");
+    };
+    document.getElementById("importBtn").onclick = () => {
+      // todo: 实现导入功能
+      console.log("导入功能待实现");
+    };
+
     // 音频事件
     this.audio.addEventListener("timeupdate", () => {
       const cur = this.audio.currentTime,

@@ -26,6 +26,37 @@ body {
   position: relative;
 }
 
+/* 功能按钮区域 */
+.function-buttons {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+.function-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.function-btn:hover {
+  background: #1db954;
+  transform: scale(1.1);
+}
+
+.function-btn img {
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+}
+
 /* 自定义滚动条样式 */
 .playlist-container::-webkit-scrollbar,
 .lyrics-container::-webkit-scrollbar {

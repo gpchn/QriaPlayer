@@ -7,10 +7,9 @@
     <!-- CSS引入 -->
     <link rel="stylesheet" href="/static/css/main.css" />
     <link rel="stylesheet" href="/static/css/scrollTo.css" />
-    <link rel="stylesheet" href="/static/css/volumeSlider.css" />
-    <link rel="stylesheet" href="/static/css/welcome.css" />
     <link rel="stylesheet" href="/static/css/video.css" />
     <link rel="stylesheet" href="/static/css/modal.css" />
+    <link rel="stylesheet" href="/static/css/mobile.css" />
     <link rel="shortcut icon" href="/static/favicon.ico" />
   </head>
   <body>
@@ -102,7 +101,11 @@
         <video class="video-player" id="videoPlayer" controls></video>
       </div>
       <div class="welcome-container" id="welcomeContainer">
-        <img src="/static/QriaPlayer.svg" alt="QriaPlayer" class="welcome-icon" />
+        <img
+          src="/static/QriaPlayer.svg"
+          alt="QriaPlayer"
+          class="welcome-icon"
+        />
       </div>
     </div>
 
@@ -147,7 +150,9 @@
         <div class="modal-body">
           <div class="modal-sidebar">
             <ul class="sidebar-menu">
-              <li class="sidebar-item active" data-tab="local-import">本地导入</li>
+              <li class="sidebar-item active" data-tab="local-import">
+                本地导入
+              </li>
               <li class="sidebar-item" data-tab="url-import">链接导入</li>
               <li class="sidebar-item" data-tab="bilibili-import">B站解析</li>
             </ul>
@@ -157,10 +162,19 @@
             <div class="import-content" id="local-import">
               <div class="dropzone" id="fileDropzone">
                 <div class="dropzone-content">
-                  <p>拖放音频文件到此处</p>
-                  <p class="small">支持的格式: MP3, WAV, FLAC</p>
-                  <button class="action-btn" id="selectFileBtn">选择文件</button>
-                  <input type="file" id="fileInput" accept=".mp3,.wav,.flac" multiple class="hidden-file-input">
+                  <button class="action-btn" id="selectFileBtn">
+                    选择文件
+                  </button>
+                  <label for="fileInput" class="visually-hidden"
+                    >拖放音频文件到此处</label
+                  >
+                  <input
+                    type="file"
+                    id="fileInput"
+                    accept=".mp3,.wav,.flac"
+                    multiple
+                    class="hidden-file-input"
+                  />
                 </div>
               </div>
               <div class="upload-list" id="uploadList"></div>
@@ -169,15 +183,27 @@
               <div class="url-import-form">
                 <div class="form-group">
                   <label for="musicUrl">音乐链接</label>
-                  <input type="text" id="musicUrl" placeholder="输入音乐直链地址...">
+                  <input
+                    type="text"
+                    id="musicUrl"
+                    placeholder="输入音乐直链地址..."
+                  />
                 </div>
                 <div class="form-group">
                   <label for="musicTitle">音乐标题 (可选)</label>
-                  <input type="text" id="musicTitle" placeholder="输入音乐标题...">
+                  <input
+                    type="text"
+                    id="musicTitle"
+                    placeholder="输入音乐标题..."
+                  />
                 </div>
                 <div class="form-group">
                   <label for="musicArtist">艺术家 (可选)</label>
-                  <input type="text" id="musicArtist" placeholder="输入艺术家名称...">
+                  <input
+                    type="text"
+                    id="musicArtist"
+                    placeholder="输入艺术家名称..."
+                  />
                 </div>
                 <button class="action-btn" id="importUrlBtn">导入链接</button>
               </div>
@@ -186,7 +212,11 @@
               <div class="bilibili-import-form">
                 <div class="form-group">
                   <label for="biliUrl">B站视频链接</label>
-                  <input type="text" id="biliUrl" placeholder="例如: https://www.bilibili.com/video/BVxxxxxxxxx">
+                  <input
+                    type="text"
+                    id="biliUrl"
+                    placeholder="例如: https://www.bilibili.com/video/BVxxxxxxxxx"
+                  />
                 </div>
                 <button class="action-btn" id="parseBiliBtn">解析视频</button>
                 <div class="bili-result" id="biliResult"></div>

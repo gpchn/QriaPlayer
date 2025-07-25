@@ -54,9 +54,10 @@ def setup_tray():
     def click_menu(icon, item):
         if window_visible:
             hide_window()
+            icon.notify("QriaPlayer", "窗口已隐藏")
         else:
             show_window()
-        icon.notify("QriaPlayer", "Hello!")
+            icon.notify("QriaPlayer", "窗口已显示")
 
     # 加载图标
     icon_image = Image.open("QriaPlayer.ico")

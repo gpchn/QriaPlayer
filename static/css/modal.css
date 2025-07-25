@@ -142,6 +142,11 @@
   transition: all 0.3s ease;
   margin-bottom: 20px;
   background: transparent; /* 使用透明背景 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 250px; /* 最小高度 */
+  flex-grow: 0; /* 不要自动增长 */
 }
 
 .dropzone:hover {
@@ -168,9 +173,9 @@
   font-size: 16px; /* 增大字体大小 */
 }
 
-.dropzone p.small {
-  font-size: 12px;
-  color: #888;
+.import-content {
+  display: flex;
+  flex-direction: column;
 }
 
 .import-content button.action-btn {
@@ -247,6 +252,7 @@
 
 .upload-list {
   margin-top: 20px;
+  margin-bottom: 20px;
 }
 
 .upload-item {
@@ -311,6 +317,7 @@
   display: none;
   padding: 0 20px 20px 20px; /* 添加内边距，避免内容顶到边缘 */
   border: none; /* 移除可能的边框 */
+  overflow-y: auto; /* 添加垂直滚动，仅在内容超出时显示 */
 }
 
 .bili-result {

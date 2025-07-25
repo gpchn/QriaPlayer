@@ -28,13 +28,19 @@ app: bottle.Bottle = bottle.Bottle()
 class PlayState:
     """播放状态数据模型"""
 
-    def __init__(self, filename: str = "", current_time: float = -1.0, media_type: str = "music") -> None:
+    def __init__(
+        self, filename: str = "", current_time: float = -1.0, media_type: str = "music"
+    ) -> None:
         self.filename: str = filename
         self.current_time: float = current_time
         self.media_type: str = media_type  # 媒体类型: "music" 或 "video"
 
     def to_dict(self) -> dict:
-        return {"filename": self.filename, "current_time": self.current_time, "type": self.media_type}
+        return {
+            "filename": self.filename,
+            "current_time": self.current_time,
+            "type": self.media_type,
+        }
 
     def to_json(self) -> str:
         return json.dumps(self.to_dict())

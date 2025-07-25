@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="/static/css/volumeSlider.css" />
     <link rel="stylesheet" href="/static/css/welcome.css" />
     <link rel="stylesheet" href="/static/css/video.css" />
+    <link rel="stylesheet" href="/static/css/modal.css" />
     <link rel="shortcut icon" href="/static/favicon.ico" />
   </head>
   <body>
@@ -102,6 +103,99 @@
       </div>
       <div class="welcome-container" id="welcomeContainer">
         <img src="/static/QriaPlayer.svg" alt="QriaPlayer" class="welcome-icon" />
+      </div>
+    </div>
+
+    <!-- 设置显示框 -->
+    <div class="function-modal" id="settingsModal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>设置</h3>
+          <button class="close-btn" id="closeSettingsBtn">
+            <img src="/static/icons/x.svg" alt="关闭" />
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-sidebar">
+            <ul class="sidebar-menu">
+              <li class="sidebar-item active">基本设置</li>
+              <li class="sidebar-item">音频设置</li>
+              <li class="sidebar-item">界面设置</li>
+              <li class="sidebar-item">关于</li>
+            </ul>
+          </div>
+          <div class="modal-main">
+            <!-- 设置功能内容区域 -->
+            <div class="settings-content">
+              <!-- todo: 实现设置功能内容 -->
+              <p class="placeholder-text">设置功能开发中...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 导入显示框 -->
+    <div class="function-modal" id="importModal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>导入</h3>
+          <button class="close-btn" id="closeImportBtn">
+            <img src="/static/icons/x.svg" alt="关闭" />
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-sidebar">
+            <ul class="sidebar-menu">
+              <li class="sidebar-item active" data-tab="local-import">本地导入</li>
+              <li class="sidebar-item" data-tab="url-import">链接导入</li>
+              <li class="sidebar-item" data-tab="bilibili-import">B站解析</li>
+            </ul>
+          </div>
+          <div class="modal-main">
+            <!-- 导入功能内容区域 -->
+            <div class="import-content" id="local-import">
+              <div class="dropzone" id="fileDropzone">
+                <div class="dropzone-content">
+                  <img src="/static/icons/music.svg" alt="音乐文件" class="dropzone-icon">
+                  <p>拖放音频文件到此处</p>
+                  <p class="small">支持的格式: MP3, WAV, FLAC</p>
+                  <button class="action-btn" id="selectFileBtn">选择文件</button>
+                  <input type="file" id="fileInput" accept=".mp3,.wav,.flac" multiple style="display: none;">
+                </div>
+              </div>
+              <div class="upload-list" id="uploadList"></div>
+            </div>
+            <div class="import-content" id="url-import" style="display: none;">
+              <div class="url-import-form">
+                <div class="form-group">
+                  <label for="musicUrl">音乐链接</label>
+                  <input type="text" id="musicUrl" placeholder="输入音乐直链地址...">
+                </div>
+                <div class="form-group">
+                  <label for="musicTitle">音乐标题 (可选)</label>
+                  <input type="text" id="musicTitle" placeholder="输入音乐标题...">
+                </div>
+                <div class="form-group">
+                  <label for="musicArtist">艺术家 (可选)</label>
+                  <input type="text" id="musicArtist" placeholder="输入艺术家名称...">
+                </div>
+                <button class="action-btn" id="importUrlBtn">导入链接</button>
+              </div>
+            </div>
+            <div class="import-content" id="bilibili-import" style="display: none;">
+              <div class="bilibili-import-form">
+                <div class="form-group">
+                  <label for="biliUrl">B站视频链接</label>
+                  <input type="text" id="biliUrl" placeholder="输入B站视频链接...">
+                  <p class="small">例如: https://www.bilibili.com/video/BVxxxxxxxxx</p>
+                </div>
+                <button class="action-btn" id="parseBiliBtn">解析视频</button>
+                <div class="bili-result" id="biliResult" style="display: none;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 

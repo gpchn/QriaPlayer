@@ -551,15 +551,277 @@ class Player {
     document.getElementById("loopBtn").onclick = () => this.toggleLoopMode();
     document.getElementById("muteBtn").onclick = () => this.toggleMute();
 
-    // 功能按钮
+    // 功能按钮 - 设置
     document.getElementById("settingsBtn").onclick = () => {
       // todo: 实现设置功能
-      console.log("设置功能待实现");
+      document.getElementById("settingsModal").style.display = "flex";
     };
+
+    // 关闭设置模态框
+    document.getElementById("closeSettingsBtn").onclick = () => {
+      document.getElementById("settingsModal").style.display = "none";
+    };
+
+    // 功能按钮 - 导入
     document.getElementById("importBtn").onclick = () => {
-      // todo: 实现导入功能
-      console.log("导入功能待实现");
+      document.getElementById("importModal").style.display = "flex";
     };
+
+    // 关闭导入模态框
+    document.getElementById("closeImportBtn").onclick = () => {
+      document.getElementById("importModal").style.display = "none";
+    };
+
+    // 导入功能的标签页切换
+    const importTabs = document.querySelectorAll('.sidebar-item[data-tab]');
+    const importContents = document.querySelectorAll('.import-content');
+
+    importTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        // 移除所有标签页的活动状态
+        importTabs.forEach(t => t.classList.remove('active'));
+        // 隐藏所有内容
+        importContents.forEach(content => {
+          content.style.display = 'none';
+        });
+
+        // 设置当前标签页为活动状态
+        tab.classList.add('active');
+
+        // 显示相应的内容
+        const tabId = tab.getAttribute('data-tab');
+        document.getElementById(tabId).style.display = 'block';
+      });
+    });
+
+    // 本地文件拖放上传功能
+    const dropzone = document.getElementById('fileDropzone');
+    const fileInput = document.getElementById('fileInput');
+    const selectFileBtn = document.getElementById('selectFileBtn');
+    const uploadList = document.getElementById('uploadList');
+
+    // 选择文件按钮点击事件
+    selectFileBtn.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    // 监听文件选择
+    fileInput.addEventListener('change', (e) => {
+      handleFiles(e.target.files);
+    });
+
+    // 拖放区域事件
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropzone.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    // 拖放区域高亮
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropzone.addEventListener(eventName, () => {
+        dropzone.classList.add('active');
+      }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropzone.addEventListener(eventName, () => {
+        dropzone.classList.remove('active');
+      }, false);
+    });
+
+    // 处理拖放文件
+    dropzone.addEventListener('drop', (e) => {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      handleFiles(files);
+    });
+
+    // 处理选择的文件
+    function handleFiles(files) {
+      const validFiles = Array.from(files).filter(file => {
+        const fileType = file.type;
+        return fileType === 'audio/mpeg' || fileType === 'audio/wav' || fileType === 'audio/flac';
+      });
+
+      if (validFiles.length === 0) {
+        alert('请选择有效的音频文件（MP3, WAV, FLAC）');
+        return;
+      }
+
+      // 显示上传列表
+      validFiles.forEach(file => {
+        uploadFile(file);
+      });
+    }
+
+    // 上传文件到服务器
+    async function uploadFile(file) {
+      // 创建上传项目
+      const uploadItem = document.createElement('div');
+      uploadItem.className = 'upload-item';
+      uploadItem.innerHTML = `
+        <div class="upload-item-name">${file.name}</div>
+        <div class="upload-item-status">上传中...</div>
+      `;
+      uploadList.appendChild(uploadItem);
+
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        // 发送到服务器
+        const response = await fetch('/api/upload_music', {
+          method: 'POST',
+          body: formData
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          uploadItem.querySelector('.upload-item-status').textContent = '上传成功';
+          // 刷新播放列表
+          await window.player.loadPlaylist();
+        } else {
+          throw new Error(result.error || '上传失败');
+        }
+      } catch (error) {
+        console.error('上传失败:', error);
+        uploadItem.querySelector('.upload-item-status').textContent = '上传失败';
+        uploadItem.querySelector('.upload-item-status').classList.add('upload-item-error');
+      }
+    }
+
+    // 链接导入功能
+    const importUrlBtn = document.getElementById('importUrlBtn');
+    importUrlBtn.addEventListener('click', async () => {
+      const url = document.getElementById('musicUrl').value.trim();
+      const title = document.getElementById('musicTitle').value.trim() || '未命名音乐';
+      const artist = document.getElementById('musicArtist').value.trim() || '未知艺术家';
+
+      if (!url) {
+        alert('请输入音乐链接');
+        return;
+      }
+
+      importUrlBtn.textContent = '正在导入...';
+      importUrlBtn.disabled = true;
+
+      try {
+        const response = await fetch('/api/import_url', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ url, title, artist })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          alert('导入成功！');
+          // 清空输入框
+          document.getElementById('musicUrl').value = '';
+          document.getElementById('musicTitle').value = '';
+          document.getElementById('musicArtist').value = '';
+          // 刷新播放列表
+          await window.player.loadPlaylist();
+        } else {
+          throw new Error(result.error || '导入失败');
+        }
+      } catch (error) {
+        console.error('导入失败:', error);
+        alert(`导入失败: ${error.message || '未知错误'}`);
+      } finally {
+        importUrlBtn.textContent = '导入链接';
+        importUrlBtn.disabled = false;
+      }
+    });
+
+    // B站解析功能
+    const parseBiliBtn = document.getElementById('parseBiliBtn');
+    parseBiliBtn.addEventListener('click', async () => {
+      const url = document.getElementById('biliUrl').value.trim();
+
+      if (!url) {
+        alert('请输入B站视频链接');
+        return;
+      }
+
+      parseBiliBtn.textContent = '正在解析...';
+      parseBiliBtn.disabled = true;
+
+      try {
+        const response = await fetch('/api/parse_bilibili', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ url })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          // 显示视频信息和可选音频
+          const biliResult = document.getElementById('biliResult');
+          biliResult.style.display = 'block';
+          biliResult.innerHTML = `
+            <div class="bili-video-info">
+              <img class="bili-video-cover" src="${result.cover}" alt="${result.title}">
+              <div class="bili-video-details">
+                <div class="bili-video-title">${result.title}</div>
+                <div class="bili-video-uploader">UP主: ${result.uploader}</div>
+              </div>
+            </div>
+            <button class="action-btn" id="importBiliBtn">导入选中音频</button>
+          `;
+
+          // 导入选中音频
+          document.getElementById('importBiliBtn').addEventListener('click', async () => {
+            try {
+              const importResponse = await fetch('/api/import_bilibili', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                  url: url,
+                  title: result.title,
+                  artist: result.uploader
+                })
+              });
+
+              const importResult = await importResponse.json();
+
+              if (importResult.success) {
+                alert('导入成功！');
+                document.getElementById('biliUrl').value = '';
+                biliResult.style.display = 'none';
+                // 刷新播放列表
+                await window.player.loadPlaylist();
+              } else {
+                throw new Error(importResult.error || '导入失败');
+              }
+            } catch (error) {
+              console.error('导入失败:', error);
+              alert(`导入失败: ${error.message || '未知错误'}`);
+            }
+          });
+        } else {
+          throw new Error(result.error || '解析失败');
+        }
+      } catch (error) {
+        console.error('解析失败:', error);
+        alert(`解析失败: ${error.message || '未知错误'}`);
+      } finally {
+        parseBiliBtn.textContent = '解析视频';
+        parseBiliBtn.disabled = false;
+      }
+    });
 
     // 音频事件
     this.audio.addEventListener("timeupdate", () => {

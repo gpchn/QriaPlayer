@@ -1,4 +1,3 @@
-
 /* 功能模态窗口样式 */
 .function-modal {
   position: fixed;
@@ -7,7 +6,7 @@
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.8);
-  display: flex;
+  display: none; /* 默认隐藏 */
   align-items: center;
   justify-content: center;
   z-index: 1000;
@@ -25,6 +24,11 @@
   flex-direction: column;
   overflow: hidden;
   box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+}
+
+/* 隐藏文件输入框 */
+.hidden-file-input {
+  display: none;
 }
 
 .modal-header {
@@ -77,6 +81,25 @@
   overflow-y: auto;
 }
 
+/* 与主应用一致的滚动条样式 */
+.modal-sidebar::-webkit-scrollbar,
+.modal-main::-webkit-scrollbar {
+  width: 8px;
+  background: #252525; /* 滚动条背景色 */
+}
+
+.modal-sidebar::-webkit-scrollbar-thumb,
+.modal-main::-webkit-scrollbar-thumb {
+  background: #1db954; /* 滚动条滑块颜色 */
+  border-radius: 4px;
+}
+
+.modal-main {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
 .sidebar-menu {
   list-style: none;
   padding: 0;
@@ -88,7 +111,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   color: #ccc;
-  font-size: 14px;
+  font-size: 16px; /* 增大字体 */
 }
 
 .sidebar-item:hover {
@@ -102,12 +125,6 @@
   font-weight: 500;
 }
 
-.modal-main {
-  flex: 1;
-  padding: 20px;
-  overflow-y: auto;
-}
-
 /* 占位文本样式 */
 .placeholder-text {
   color: #999;
@@ -119,35 +136,36 @@
 /* 导入功能样式 */
 .dropzone {
   border: 2px dashed #444;
-  border-radius: 10px;
+  border-radius: 8px;
   padding: 40px 20px;
   text-align: center;
   transition: all 0.3s ease;
   margin-bottom: 20px;
-  background: #2d2d2d;
+  background: transparent; /* 使用透明背景 */
+}
+
+.dropzone:hover {
+  border-color: #1db954;
+  box-shadow: 0 0 10px rgba(29, 185, 84, 0.3); /* hover时添加发光效果 */
 }
 
 .dropzone.active {
   border-color: #1db954;
-  background: rgba(29, 185, 84, 0.1);
+  box-shadow: 0 0 15px rgba(29, 185, 84, 0.4); /* 拖拽状态增强发光效果 */
 }
 
 .dropzone-content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-}
-
-.dropzone-icon {
-  width: 48px;
-  height: 48px;
-  opacity: 0.6;
+  gap: 15px;
+  margin: 0 auto;
 }
 
 .dropzone p {
   margin: 5px 0;
   color: #ccc;
+  font-size: 16px; /* 增大字体大小 */
 }
 
 .dropzone p.small {
@@ -156,25 +174,40 @@
 }
 
 .action-btn {
-  background: #1db954;
-  color: #000;
+  background: rgba(255, 255, 255, 0.1); /* 半透明背景 */
+  color: white;
   border: none;
-  border-radius: 20px;
-  padding: 8px 20px;
-  font-size: 14px;
-  font-weight: 500;
+  border-radius: 8px; /* 与其他元素一致的圆角 */
+  padding: 10px 25px;
+  font-size: 15px;
+  font-weight: 400;
   cursor: pointer;
-  transition: all 0.2s ease;
-  margin-top: 10px;
+  transition: all 0.3s ease;
+  margin-top: 20px;
+  display: inline-block; /* 横向条状按钮 */
+  min-width: 100px;
+  text-align: center;
+  white-space: nowrap; /* 防止文字换行 */
+  margin-left: 0; /* 防止左侧出现空白 */
+  margin-right: 0; /* 防止右侧出现空白 */
 }
 
 .action-btn:hover {
-  background: #1ed760;
-  transform: scale(1.05);
+  background: #1db954; /* 悬停时使用绿色背景 */
+  color: rgba(0, 0, 0, 0.8); /* 略微透明的黑色文字 */
+  box-shadow: 0 0 10px rgba(29, 185, 84, 0.4); /* 添加发光效果 */
+}
+
+.action-btn:disabled {
+  background: #333;
+  color: #666;
+  cursor: not-allowed;
 }
 
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 25px;
+  position: relative;
+  width: 95%; /* 确保不顶到边缘 */
 }
 
 .form-group label {
@@ -186,18 +219,19 @@
 
 .form-group input {
   width: 100%;
-  padding: 10px;
+  padding: 12px; /* 与searchBox一致 */
   border: 1px solid #444;
-  background: #333;
+  background: #383838; /* 与searchBox一致 */
   color: #fff;
-  border-radius: 4px;
+  border-radius: 8px; /* 与searchBox一致 */
   font-size: 14px;
+  transition: all 0.3s ease; /* 与searchBox一致 */
 }
 
 .form-group input:focus {
   outline: none;
   border-color: #1db954;
-  box-shadow: 0 0 0 2px rgba(29, 185, 84, 0.2);
+  box-shadow: 0 0 0 2px rgba(29, 185, 84, 0.2); /* 与searchBox一致 */
 }
 
 .upload-list {
@@ -231,8 +265,14 @@
 }
 
 /* 导入功能的选项卡样式 */
-.import-content {
-  animation: fadeIn 0.3s ease;
+/* 显示活动的标签页内容 */
+#local-import {
+  display: block; /* 默认显示第一个标签页 */
+}
+
+/* 显示活动的结果区域 */
+.bili-result {
+  display: none; /* 默认隐藏结果区域 */
 }
 
 @keyframes fadeIn {
@@ -247,16 +287,29 @@
 }
 
 /* 链接导入和B站导入样式 */
-.url-import-form, .bilibili-import-form {
+.url-import-form,
+.bilibili-import-form {
   max-width: 600px;
   margin: 0 auto;
+  padding: 0 20px; /* 添加内边距，避免内容顶到边缘 */
+}
+
+/* 包装器，避免内容溢出到外边框 */
+.import-content {
+  animation: fadeIn 0.3s ease;
+  display: none;
+  padding: 0 20px 20px 20px; /* 添加内边距，避免内容顶到边缘 */
+  border: none; /* 移除可能的边框 */
 }
 
 .bili-result {
   margin-top: 20px;
   padding: 15px;
-  background: #333;
-  border-radius: 6px;
+  background: #383838; /* 与searchBox一致 */
+  border-radius: 8px; /* 与其他元素一致 */
+  border: 1px solid #444;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.3s ease;
 }
 
 .bili-video-info {

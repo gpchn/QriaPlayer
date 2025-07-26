@@ -17,13 +17,12 @@ class Player {
   async checkSavedPlayState() {
     try {
       console.log("正在检查保存的播放状态...");
-      const res = await fetch("/api/play_state");
-      if (!res.ok) {
-        console.log("获取播放状态请求失败");
-        return;
-      }
+      const state = await $.ajax({
+        url: "/api/play_state",
+        method: "GET",
+        dataType: "json"
+      });
 
-      const state = await res.json();
       console.log("获取到保存的状态:", state);
 
       // 如果有保存的文件名，等待播放列表加载完成后恢复
@@ -70,18 +69,17 @@ class Player {
       if (currentItem.type === "music") {
         state.current_time = this.audio.currentTime || 0;
       } else if (currentItem.type === "video") {
-        const videoPlayer = document.getElementById("videoPlayer");
-        state.current_time = videoPlayer.currentTime || 0;
+        const $videoPlayer = $("#videoPlayer");
+        state.current_time = $videoPlayer[0].currentTime || 0;
       }
 
       try {
         console.log("保存播放状态:", state);
-        await fetch("/api/play_state", {
+        await $.ajax({
+          url: "/api/play_state",
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(state),
+          contentType: "application/json",
+          data: JSON.stringify(state)
         });
       } catch (err) {
         console.error("保存播放状态失败:", err);
@@ -104,7 +102,7 @@ class Player {
         this.hasPlayed = true;
 
         // 移除欢迎样式
-        document.getElementById("welcomeContainer").style.display = "none";
+        $("#welcomeContainer").hide();
 
         // 播放对应的媒体
         await this.playAt(idx);
@@ -118,15 +116,16 @@ class Player {
             this.audio.currentTime = state.current_time;
             // 总是暂停在恢复的位置，不自动播放
             this.audio.pause();
-            document.getElementById("playPauseIcon").src =
-              "/static/icons/play.svg";
-            document.getElementById("playPauseIcon").alt = "播放";
+            $("#playPauseIcon").attr({
+              "src": "/static/icons/play.svg",
+              "alt": "播放"
+            });
           } else if (mediaType === "video") {
             // 设置视频播放进度
-            const videoPlayer = document.getElementById("videoPlayer");
-            videoPlayer.currentTime = state.current_time;
+            const $videoPlayer = $("#videoPlayer");
+            $videoPlayer[0].currentTime = state.current_time;
             // 总是暂停在恢复的位置，不自动播放
-            videoPlayer.pause();
+            $videoPlayer[0].pause();
           }
         }
       }
@@ -135,9 +134,12 @@ class Player {
 
   async loadPlaylist() {
     // 获取播放列表
-    const res = await fetch("/api/playlist");
-    const { playlist } = await res.json();
-    this.playlist = playlist;
+    const data = await $.ajax({
+      url: "/api/playlist",
+      method: "GET",
+      dataType: "json"
+    });
+    this.playlist = data.playlist;
     this.renderPlaylist();
 
     // 播放列表加载完成后，尝试恢复播放状态
@@ -153,21 +155,19 @@ class Player {
             s.artist.toLowerCase().includes(filter.toLowerCase())
         )
       : this.playlist;
-    const ul = document.getElementById("playlist");
-    ul.innerHTML = "";
+    const $ul = $("#playlist");
+    $ul.empty();
     list.forEach((item, idx) => {
-      const li = document.createElement("li");
-      li.className = idx === this.currentIndex ? "playing" : "";
-      // 区分视频和音频
-      if (item.type === "video") {
-        li.classList.add("video-item");
-      }
-      li.innerHTML = `
-        <div class="song-name">${item.title}</div>
-        <div class="song-artist">${item.artist}</div>
-      `;
-      li.onclick = () => this.playAt(this.playlist.indexOf(item));
-      ul.appendChild(li);
+      const $li = $("<li></li>")
+        .addClass(idx === this.currentIndex ? "playing" : "")
+        // 区分视频和音频
+        .toggleClass("video-item", item.type === "video")
+        .html(`
+          <div class="song-name">${item.title}</div>
+          <div class="song-artist">${item.artist}</div>
+        `)
+        .on("click", () => this.playAt(this.playlist.indexOf(item)));
+      $ul.append($li);
     });
 
     // 触发检查当前播放歌曲是否在可视区域内
@@ -175,26 +175,26 @@ class Player {
   }
 
   updateScrollToPlayingButton() {
-    const playlistContainer = document.querySelector(".playlist-container");
-    const scrollToPlayingBtn = document.getElementById("scrollToPlayingBtn");
-    if (!playlistContainer || !scrollToPlayingBtn) return;
+    const $playlistContainer = $(".playlist-container");
+    const $scrollToPlayingBtn = $("#scrollToPlayingBtn");
+    if (!$playlistContainer.length || !$scrollToPlayingBtn.length) return;
 
-    const playingElement = document.querySelector("#playlist li.playing");
-    if (playingElement && this.currentIndex >= 0) {
-      const playlistRect = playlistContainer.getBoundingClientRect();
-      const playingRect = playingElement.getBoundingClientRect();
+    const $playingElement = $("#playlist li.playing");
+    if ($playingElement.length && this.currentIndex >= 0) {
+      const playlistRect = $playlistContainer[0].getBoundingClientRect();
+      const playingRect = $playingElement[0].getBoundingClientRect();
 
       // 当前播放歌曲不在可视区域内时显示按钮
       if (
         playingRect.top < playlistRect.top ||
         playingRect.bottom > playlistRect.bottom
       ) {
-        scrollToPlayingBtn.classList.add("show");
+        $scrollToPlayingBtn.addClass("show");
       } else {
-        scrollToPlayingBtn.classList.remove("show");
+        $scrollToPlayingBtn.removeClass("show");
       }
     } else {
-      scrollToPlayingBtn.classList.remove("show");
+      $scrollToPlayingBtn.removeClass("show");
     }
   }
 
@@ -211,7 +211,7 @@ class Player {
       // 设置标志，表示已经开始播放
       this.hasPlayed = true;
       // 移除欢迎样式
-      document.getElementById("welcomeContainer").style.display = "none";
+      $("#welcomeContainer").hide();
     }
 
     this.currentIndex = idx;
@@ -219,14 +219,14 @@ class Player {
 
     if (item.type === "music") {
       // 显示歌曲信息
-      document.getElementById("songTitle").textContent = item.title;
-      document.getElementById("songArtist").textContent = item.artist;
+      $("#songTitle").text(item.title);
+      $("#songArtist").text(item.artist);
       // 显示控制组件
-      document.getElementById("musicPlayerContainer").style.display = "flex";
-      // 显示控制组件
-      document.getElementById("videoPlayerContainer").style.display = "none";
+      $("#musicPlayerContainer").css("display", "flex");
+      // 隐藏视频组件
+      $("#videoPlayerContainer").hide();
       // 暂停视频
-      document.getElementById("videoPlayer").pause();
+      $("#videoPlayer")[0].pause();
 
       // 音频
       this.audio.src = `/media/music/${item.filename}`;
@@ -235,23 +235,23 @@ class Player {
       this.loadLyrics(item.filename);
     } else if (item.type === "video") {
       // 显示视频信息
-      document.getElementById("videoTitle").textContent = item.title;
-      document.getElementById("videoArtist").textContent = item.artist;
-      // 显示控制组件
-      document.getElementById("musicPlayerContainer").style.display = "none";
-      // 显示控制组件
-      document.getElementById("videoPlayerContainer").style.display = "block";
+      $("#videoTitle").text(item.title);
+      $("#videoArtist").text(item.artist);
+      // 隐藏音乐控制组件
+      $("#musicPlayerContainer").hide();
+      // 显示视频控制组件
+      $("#videoPlayerContainer").show();
       // 暂停音乐
       this.audio.pause();
 
-      player = document.getElementById("videoPlayer");
-      player.src = `/media/video/${item.filename}`;
-      player.play();
+      const $player = $("#videoPlayer");
+      $player.attr("src", `/media/video/${item.filename}`);
+      $player[0].play();
     } else {
       console.error("未知媒体类型:", item.type);
       return;
     }
-    this.renderPlaylist(document.getElementById("searchBox").value);
+    this.renderPlaylist($("#searchBox").val());
 
     // 更新返回当前播放歌曲按钮状态
     setTimeout(() => this.updateScrollToPlayingButton(), 300); // 延迟一点执行，确保 DOM 已更新
@@ -266,11 +266,12 @@ class Player {
     }
     this.lyrics = [];
     try {
-      const lrcRes = await fetch(
-        `/api/get_lrc/${filename.replace(".mp3", ".lrc")}`
-      );
-      const { lyrics } = await lrcRes.json();
-      this.lyrics = this.parseLyrics(lyrics);
+      const data = await $.ajax({
+        url: `/api/get_lrc/${filename.replace(".mp3", ".lrc")}`,
+        method: "GET",
+        dataType: "json"
+      });
+      this.lyrics = this.parseLyrics(data.lyrics);
     } catch {
       this.lyrics = [];
     }
@@ -295,9 +296,9 @@ class Player {
   }
 
   updateLyrics(currentTime) {
-    const box = document.getElementById("lyricsBox");
+    const $box = $("#lyricsBox");
     if (!this.lyrics.length) {
-      box.innerHTML = "<div>暂无歌词</div>";
+      $box.html("<div>暂无歌词</div>");
       return;
     }
     let idx = -1;
@@ -310,25 +311,25 @@ class Player {
     if (idx === -1 && currentTime >= this.lyrics[this.lyrics.length - 1].time) {
       idx = this.lyrics.length - 1;
     }
-    box.innerHTML = this.lyrics
+    $box.html(this.lyrics
       .map(
         (l, i) =>
           `<div class="${i === idx ? "lyrics-highlight" : ""}">${l.text}</div>`
       )
-      .join("");
+      .join(""));
     // 歌词垂直居中：将当前歌词的中心与歌词框的中心对齐
     // 只有当用户没有正在滚动歌词时才自动滚动
     if (idx !== -1 && !this.isUserScrollingLyrics) {
-      const active = box.children[idx];
-      if (active) {
-        const boxRect = box.getBoundingClientRect();
-        const boxScrollTop = box.scrollTop;
+      const $active = $box.children().eq(idx);
+      if ($active.length) {
+        const boxRect = $box[0].getBoundingClientRect();
+        const boxScrollTop = $box.scrollTop();
         const boxCenter = boxRect.height / 2;
-        const activeRect = active.getBoundingClientRect();
+        const activeRect = $active[0].getBoundingClientRect();
         const activeOffset = activeRect.top - boxRect.top + boxScrollTop;
-        const activeCenter = activeOffset + active.offsetHeight / 2;
+        const activeCenter = activeOffset + $active.outerHeight() / 2;
         const targetScroll = activeCenter - boxCenter;
-        box.scrollTo({ top: targetScroll, behavior: "smooth" });
+        $box.stop().animate({ scrollTop: targetScroll }, 300);
       }
     }
   }
@@ -355,12 +356,16 @@ class Player {
   togglePlay() {
     if (this.audio.paused) {
       this.audio.play();
-      document.getElementById("playPauseIcon").src = "/static/icons/pause.svg";
-      document.getElementById("playPauseIcon").alt = "暂停";
+      $("#playPauseIcon").attr({
+        src: "/static/icons/pause.svg",
+        alt: "暂停"
+      });
     } else {
       this.audio.pause();
-      document.getElementById("playPauseIcon").src = "/static/icons/play.svg";
-      document.getElementById("playPauseIcon").alt = "播放";
+      $("#playPauseIcon").attr({
+        src: "/static/icons/play.svg",
+        alt: "播放"
+      });
 
       // 暂停时保存播放状态
       this.savePlayState();
@@ -377,28 +382,33 @@ class Player {
       "/static/icons/loop-list.svg",
       "/static/icons/loop-random.svg",
     ];
-    document.getElementById("loopText").textContent = txts[this.loopMode];
-    document.getElementById("loopIcon").src = icons[this.loopMode];
-    document.getElementById("loopIcon").alt = "循环" + txts[this.loopMode];
+    $("#loopText").text(txts[this.loopMode]);
+    $("#loopIcon").attr({
+      src: icons[this.loopMode],
+      alt: "循环" + txts[this.loopMode]
+    });
   }
 
   toggleMute() {
     this.audio.muted = !this.audio.muted;
-    const muteIcon = document.getElementById("muteIcon");
+    const $muteIcon = $("#muteIcon");
     if (this.audio.muted) {
-      muteIcon.src = "/static/icons/mute.svg";
-      muteIcon.alt = "静音";
+      $muteIcon.attr({
+        src: "/static/icons/mute.svg",
+        alt: "静音"
+      });
     } else {
-      muteIcon.src = "/static/icons/volume.svg";
-      muteIcon.alt = "音量";
+      $muteIcon.attr({
+        src: "/static/icons/volume.svg",
+        alt: "音量"
+      });
     }
   }
 
   setVolume(val) {
     this.audio.volume = val;
     // 更新滑块颜色
-    const volumeSlider = document.getElementById("volumeSlider");
-    volumeSlider.style.setProperty("--volume-percent", val * 100 + "%");
+    $("#volumeSlider").css("--volume-percent", val * 100 + "%");
   }
 
   seek(val) {
@@ -423,15 +433,15 @@ class Player {
     }, 30000);
 
     // 页面关闭时保存状态
-    window.addEventListener("beforeunload", () => {
+    $(window).on("beforeunload", () => {
       this.savePlayState();
     });
 
     // 为视频播放器添加事件监听
-    const videoPlayer = document.getElementById("videoPlayer");
+    const $videoPlayer = $("#videoPlayer");
 
     // 视频暂停时保存状态
-    videoPlayer.addEventListener("pause", () => {
+    $videoPlayer.on("pause", () => {
       if (
         this.currentIndex !== -1 &&
         this.playlist[this.currentIndex].type === "video"
@@ -442,7 +452,7 @@ class Player {
     });
 
     // 视频播放结束时保存状态
-    videoPlayer.addEventListener("ended", () => {
+    $videoPlayer.on("ended", () => {
       if (
         this.currentIndex !== -1 &&
         this.playlist[this.currentIndex].type === "video"
@@ -453,13 +463,13 @@ class Player {
     });
 
     // 搜索
-    document.getElementById("searchBox").addEventListener("input", (e) => {
-      this.renderPlaylist(e.target.value);
+    $("#searchBox").on("input", (e) => {
+      this.renderPlaylist($(e.target).val());
     });
 
     // 歌词滚动检测
-    const lyricsBox = document.getElementById("lyricsBox");
-    lyricsBox.addEventListener("scroll", () => {
+    const $lyricsBox = $("#lyricsBox");
+    $lyricsBox.on("scroll", () => {
       // 用户开始滚动歌词
       this.isUserScrollingLyrics = true;
 
@@ -475,11 +485,11 @@ class Player {
     });
 
     // 歌词滚动条 mousedown 和 mouseup 事件监听
-    lyricsBox.addEventListener("mousedown", () => {
+    $lyricsBox.on("mousedown", () => {
       this.isUserScrollingLyrics = true;
     });
 
-    document.addEventListener("mouseup", () => {
+    $(document).on("mouseup", () => {
       // 设置超时器：鼠标释放后 0.8 秒恢复自动滚动
       if (this.userScrollingTimeout) {
         clearTimeout(this.userScrollingTimeout);
@@ -490,160 +500,146 @@ class Player {
     });
 
     // 回到顶部按钮和返回当前播放歌曲按钮逻辑
-    const playlistContainer = document.querySelector(".playlist-container");
-    const scrollTopBtn = document.getElementById("scrollTopBtn");
-    const scrollToPlayingBtn = document.getElementById("scrollToPlayingBtn");
+    const $playlistContainer = $(".playlist-container");
+    const $scrollTopBtn = $("#scrollTopBtn");
+    const $scrollToPlayingBtn = $("#scrollToPlayingBtn");
 
     function updateScrollButtonsPos() {
-      const rect = playlistContainer.getBoundingClientRect();
-      scrollTopBtn.style.right = window.innerWidth - rect.right + 16 + "px";
-      scrollTopBtn.style.bottom = window.innerHeight - rect.bottom + 24 + "px";
-      scrollToPlayingBtn.style.right =
-        window.innerWidth - rect.right + 16 + "px";
-      scrollToPlayingBtn.style.bottom =
-        window.innerHeight - rect.bottom + 76 + "px"; // 在顶部按钮上方
+      const rect = $playlistContainer[0].getBoundingClientRect();
+      $scrollTopBtn.css({
+        right: $(window).width() - rect.right + 16 + "px",
+        bottom: $(window).height() - rect.bottom + 24 + "px"
+      });
+      $scrollToPlayingBtn.css({
+        right: $(window).width() - rect.right + 16 + "px",
+        bottom: $(window).height() - rect.bottom + 76 + "px" // 在顶部按钮上方
+      });
     }
 
-    window.addEventListener("resize", updateScrollButtonsPos);
-    window.addEventListener("scroll", updateScrollButtonsPos);
+    $(window).on("resize", updateScrollButtonsPos);
+    $(window).on("scroll", updateScrollButtonsPos);
     updateScrollButtonsPos();
 
-    playlistContainer.addEventListener("scroll", () => {
+    $playlistContainer.on("scroll", () => {
       // 回到顶部按钮显示逻辑
-      if (playlistContainer.scrollTop > 120) {
-        scrollTopBtn.classList.add("show");
+      if ($playlistContainer.scrollTop() > 120) {
+        $scrollTopBtn.addClass("show");
       } else {
-        scrollTopBtn.classList.remove("show");
+        $scrollTopBtn.removeClass("show");
       }
 
       // 返回到当前播放歌曲按钮显示逻辑
       this.updateScrollToPlayingButton();
     });
 
-    scrollTopBtn.onclick = () => {
-      playlistContainer.scrollTo({ top: 0, behavior: "smooth" });
-    };
+    $scrollTopBtn.on("click", () => {
+      $playlistContainer.animate({ scrollTop: 0 }, 300);
+    });
 
-    scrollToPlayingBtn.onclick = () => {
-      const playingElement = document.querySelector("#playlist li.playing");
-      if (playingElement) {
-        playingElement.scrollIntoView({ behavior: "smooth", block: "center" });
+    $scrollToPlayingBtn.on("click", () => {
+      const $playingElement = $("#playlist li.playing");
+      if ($playingElement.length) {
+        $playlistContainer.animate({
+          scrollTop: $playingElement.offset().top - $playlistContainer.offset().top + $playlistContainer.scrollTop() - ($playlistContainer.height() / 2) + ($playingElement.height() / 2)
+        }, 300);
       }
-    };
+    });
     // 进度条
-    document.getElementById("progressBar").addEventListener("input", (e) => {
-      this.seek(e.target.value);
+    $("#progressBar").on("input", (e) => {
+      this.seek($(e.target).val());
     });
     // 音量
-    const volumeSlider = document.getElementById("volumeSlider");
-    volumeSlider.addEventListener("input", (e) => {
-      const value = e.target.value;
+    const $volumeSlider = $("#volumeSlider");
+    $volumeSlider.on("input", (e) => {
+      const value = $(e.target).val();
       this.setVolume(value);
       // 更新滑块颜色
-      volumeSlider.style.setProperty("--volume-percent", value * 100 + "%");
+      $volumeSlider.css("--volume-percent", value * 100 + "%");
     });
     // 初始设置滑块颜色
-    volumeSlider.style.setProperty("--volume-percent", "100%");
+    $volumeSlider.css("--volume-percent", "100%");
     // 控制按钮
-    document.getElementById("playBtn").onclick = () => this.togglePlay();
-    document.getElementById("prevBtn").onclick = () => this.playPrev();
-    document.getElementById("nextBtn").onclick = () => this.playNext();
-    document.getElementById("loopBtn").onclick = () => this.toggleLoopMode();
-    document.getElementById("muteBtn").onclick = () => this.toggleMute();
+    $("#playBtn").on("click", () => this.togglePlay());
+    $("#prevBtn").on("click", () => this.playPrev());
+    $("#nextBtn").on("click", () => this.playNext());
+    $("#loopBtn").on("click", () => this.toggleLoopMode());
+    $("#muteBtn").on("click", () => this.toggleMute());
 
     // 功能按钮 - 设置
-    document.getElementById("settingsBtn").onclick = () => {
+    $("#settingsBtn").on("click", () => {
       // todo: 实现设置功能
-      document.getElementById("settingsModal").style.display = "flex";
-    };
+      $("#settingsModal").css("display", "flex");
+    });
 
     // 关闭设置模态框
-    document.getElementById("closeSettingsBtn").onclick = () => {
-      document.getElementById("settingsModal").style.display = "none";
-    };
+    $("#closeSettingsBtn").on("click", () => {
+      $("#settingsModal").hide();
+    });
 
     // 功能按钮 - 导入
-    document.getElementById("importBtn").onclick = () => {
-      document.getElementById("importModal").style.display = "flex";
-    };
+    $("#importBtn").on("click", () => {
+      $("#importModal").css("display", "flex");
+    });
 
     // 关闭导入模态框
-    document.getElementById("closeImportBtn").onclick = () => {
-      document.getElementById("importModal").style.display = "none";
-    };
+    $("#closeImportBtn").on("click", () => {
+      $("#importModal").hide();
+    });
 
     // 导入功能的标签页切换
-    const importTabs = document.querySelectorAll(".sidebar-item[data-tab]");
-    const importContents = document.querySelectorAll(".import-content");
+    const $importTabs = $(".sidebar-item[data-tab]");
+    const $importContents = $(".import-content");
 
-    importTabs.forEach((tab) => {
-      tab.addEventListener("click", () => {
-        // 移除所有标签页的活动状态
-        importTabs.forEach((t) => t.classList.remove("active"));
-        // 隐藏所有内容
-        importContents.forEach((content) => {
-          content.style.display = "none";
-        });
+    $importTabs.on("click", function() {
+      // 移除所有标签页的活动状态
+      $importTabs.removeClass("active");
+      // 隐藏所有内容
+      $importContents.hide();
 
-        // 设置当前标签页为活动状态
-        tab.classList.add("active");
+      // 设置当前标签页为活动状态
+      $(this).addClass("active");
 
-        // 显示相应的内容
-        const tabId = tab.getAttribute("data-tab");
-        document.getElementById(tabId).style.display = "block";
-      });
+      // 显示相应的内容
+      const tabId = $(this).data("tab");
+      $("#" + tabId).show();
     });
 
     // 本地文件拖放上传功能
-    const dropzone = document.getElementById("fileDropzone");
-    const fileInput = document.getElementById("fileInput");
-    const selectFileBtn = document.getElementById("selectFileBtn");
-    const uploadList = document.getElementById("uploadList");
+    const $dropzone = $("#fileDropzone");
+    const $fileInput = $("#fileInput");
+    const $selectFileBtn = $("#selectFileBtn");
+    const $uploadList = $("#uploadList");
 
     // 选择文件按钮点击事件
-    selectFileBtn.addEventListener("click", () => {
-      fileInput.click();
+    $selectFileBtn.on("click", () => {
+      $fileInput.trigger("click");
     });
 
     // 监听文件选择
-    fileInput.addEventListener("change", (e) => {
+    $fileInput.on("change", (e) => {
       handleFiles(e.target.files);
     });
 
     // 拖放区域事件
-    ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
-      dropzone.addEventListener(eventName, preventDefaults, false);
-    });
-
     function preventDefaults(e) {
       e.preventDefault();
       e.stopPropagation();
     }
+    
+    $dropzone.on("dragenter dragover dragleave drop", preventDefaults);
 
     // 拖放区域高亮
-    ["dragenter", "dragover"].forEach((eventName) => {
-      dropzone.addEventListener(
-        eventName,
-        () => {
-          dropzone.classList.add("active");
-        },
-        false
-      );
+    $dropzone.on("dragenter dragover", function() {
+      $(this).addClass("active");
     });
 
-    ["dragleave", "drop"].forEach((eventName) => {
-      dropzone.addEventListener(
-        eventName,
-        () => {
-          dropzone.classList.remove("active");
-        },
-        false
-      );
+    $dropzone.on("dragleave drop", function() {
+      $(this).removeClass("active");
     });
 
     // 处理拖放文件
-    dropzone.addEventListener("drop", (e) => {
-      const dt = e.dataTransfer;
+    $dropzone.on("drop", (e) => {
+      const dt = e.originalEvent.dataTransfer;
       const files = dt.files;
       handleFiles(files);
     });
@@ -673,78 +669,66 @@ class Player {
     // 上传文件到服务器
     async function uploadFile(file) {
       // 创建上传项目
-      const uploadItem = document.createElement("div");
-      uploadItem.className = "upload-item";
-      uploadItem.innerHTML = `
+      const $uploadItem = $("<div>").addClass("upload-item").html(`
         <div class="upload-item-name">${file.name}</div>
         <div class="upload-item-status">上传中...</div>
-      `;
-      uploadList.appendChild(uploadItem);
+      `);
+      $uploadList.append($uploadItem);
 
       try {
         const formData = new FormData();
         formData.append("file", file);
 
         // 发送到服务器
-        const response = await fetch("/api/upload_music", {
+        const response = await $.ajax({
+          url: "/api/upload_music",
           method: "POST",
-          body: formData,
+          data: formData,
+          processData: false,
+          contentType: false
         });
 
-        const result = await response.json();
-
-        if (result.success) {
-          uploadItem.querySelector(".upload-item-status").textContent =
-            "上传成功";
+        if (response.success) {
+          $uploadItem.find(".upload-item-status").text("上传成功");
           // 刷新播放列表
           await window.player.loadPlaylist();
         } else {
-          throw new Error(result.error || "上传失败");
+          throw new Error(response.error || "上传失败");
         }
       } catch (error) {
         console.error("上传失败:", error);
-        uploadItem.querySelector(".upload-item-status").textContent =
-          "上传失败";
-        uploadItem
-          .querySelector(".upload-item-status")
-          .classList.add("upload-item-error");
+        $uploadItem.find(".upload-item-status")
+          .text("上传失败")
+          .addClass("upload-item-error");
       }
     }
 
     // 链接导入功能
-    const importUrlBtn = document.getElementById("importUrlBtn");
-    importUrlBtn.addEventListener("click", async () => {
-      const url = document.getElementById("musicUrl").value.trim();
-      const title =
-        document.getElementById("musicTitle").value.trim() || "未命名音乐";
-      const artist =
-        document.getElementById("musicArtist").value.trim() || "未知艺术家";
+    const $importUrlBtn = $("#importUrlBtn");
+    $importUrlBtn.on("click", async () => {
+      const url = $("#musicUrl").val().trim();
+      const title = $("#musicTitle").val().trim() || "未命名音乐";
+      const artist = $("#musicArtist").val().trim() || "未知艺术家";
 
       if (!url) {
         alert("请输入音乐链接");
         return;
       }
 
-      importUrlBtn.textContent = "正在导入...";
-      importUrlBtn.disabled = true;
+      $importUrlBtn.text("正在导入...").prop("disabled", true);
 
       try {
-        const response = await fetch("/api/import_url", {
+        const result = await $.ajax({
+          url: "/api/import_url",
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ url, title, artist }),
+          contentType: "application/json",
+          data: JSON.stringify({ url, title, artist })
         });
-
-        const result = await response.json();
 
         if (result.success) {
           alert("导入成功！");
           // 清空输入框
-          document.getElementById("musicUrl").value = "";
-          document.getElementById("musicTitle").value = "";
-          document.getElementById("musicArtist").value = "";
+          $("#musicUrl, #musicTitle, #musicArtist").val("");
           // 刷新播放列表
           await window.player.loadPlaylist();
         } else {
@@ -754,40 +738,34 @@ class Player {
         console.error("导入失败:", error);
         alert(`导入失败: ${error.message || "未知错误"}`);
       } finally {
-        importUrlBtn.textContent = "导入链接";
-        importUrlBtn.disabled = false;
+        $importUrlBtn.text("导入链接").prop("disabled", false);
       }
     });
 
     // B站解析功能
-    const parseBiliBtn = document.getElementById("parseBiliBtn");
-    parseBiliBtn.addEventListener("click", async () => {
-      const url = document.getElementById("biliUrl").value.trim();
+    const $parseBiliBtn = $("#parseBiliBtn");
+    $parseBiliBtn.on("click", async () => {
+      const url = $("#biliUrl").val().trim();
 
       if (!url) {
         alert("请输入B站视频链接");
         return;
       }
 
-      parseBiliBtn.textContent = "正在解析...";
-      parseBiliBtn.disabled = true;
+      $parseBiliBtn.text("正在解析...").prop("disabled", true);
 
       try {
-        const response = await fetch("/api/parse_bilibili", {
+        const result = await $.ajax({
+          url: "/api/parse_bilibili",
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ url }),
+          contentType: "application/json",
+          data: JSON.stringify({ url })
         });
-
-        const result = await response.json();
 
         if (result.success) {
           // 显示视频信息和可选音频
-          const biliResult = document.getElementById("biliResult");
-          biliResult.style.display = "block";
-          biliResult.innerHTML = `
+          const $biliResult = $("#biliResult");
+          $biliResult.show().html(`
             <div class="bili-video-info">
               <img class="bili-video-cover" src="${result.cover}" alt="${result.title}">
               <div class="bili-video-details">
@@ -796,41 +774,36 @@ class Player {
               </div>
             </div>
             <button class="action-btn" id="importBiliBtn">导入选中音频</button>
-          `;
+          `);
 
           // 导入选中音频
-          document
-            .getElementById("importBiliBtn")
-            .addEventListener("click", async () => {
-              try {
-                const importResponse = await fetch("/api/import_bilibili", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({
-                    url: url,
-                    title: result.title,
-                    artist: result.uploader,
-                  }),
-                });
+          $("#importBiliBtn").on("click", async () => {
+            try {
+              const importResult = await $.ajax({
+                url: "/api/import_bilibili",
+                method: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({
+                  url: url,
+                  title: result.title,
+                  artist: result.uploader,
+                })
+              });
 
-                const importResult = await importResponse.json();
-
-                if (importResult.success) {
-                  alert("导入成功！");
-                  document.getElementById("biliUrl").value = "";
-                  biliResult.style.display = "none";
-                  // 刷新播放列表
-                  await window.player.loadPlaylist();
-                } else {
-                  throw new Error(importResult.error || "导入失败");
-                }
-              } catch (error) {
-                console.error("导入失败:", error);
-                alert(`导入失败: ${error.message || "未知错误"}`);
+              if (importResult.success) {
+                alert("导入成功！");
+                $("#biliUrl").val("");
+                $biliResult.hide();
+                // 刷新播放列表
+                await window.player.loadPlaylist();
+              } else {
+                throw new Error(importResult.error || "导入失败");
               }
-            });
+            } catch (error) {
+              console.error("导入失败:", error);
+              alert(`导入失败: ${error.message || "未知错误"}`);
+            }
+          });
         } else {
           throw new Error(result.error || "解析失败");
         }
@@ -838,20 +811,19 @@ class Player {
         console.error("解析失败:", error);
         alert(`解析失败: ${error.message || "未知错误"}`);
       } finally {
-        parseBiliBtn.textContent = "解析视频";
-        parseBiliBtn.disabled = false;
+        $parseBiliBtn.text("解析视频").prop("disabled", false);
       }
     });
 
     // 音频事件
-    this.audio.addEventListener("timeupdate", () => {
+    $(this.audio).on("timeupdate", () => {
       const cur = this.audio.currentTime,
         dur = this.audio.duration;
-      const bar = document.getElementById("progressBar");
-      bar.value = (cur / dur) * 100 || 0;
-      bar.style.background = `linear-gradient(to right, #2e7d32 0%, #2e7d32 ${bar.value}%, #555 ${bar.value}%, #555 100%)`;
-      document.getElementById("currentTime").textContent = this.formatTime(cur);
-      document.getElementById("duration").textContent = this.formatTime(dur);
+      const $bar = $("#progressBar");
+      $bar.val((cur / dur) * 100 || 0);
+      $bar.css("background", `linear-gradient(to right, #2e7d32 0%, #2e7d32 ${$bar.val()}%, #555 ${$bar.val()}%, #555 100%)`);
+      $("#currentTime").text(this.formatTime(cur));
+      $("#duration").text(this.formatTime(dur));
       this.updateLyrics(cur);
       // 定期检查当前播放歌曲是否在可视区域内
       if (cur % 2 < 0.1) {
@@ -859,45 +831,50 @@ class Player {
         this.updateScrollToPlayingButton();
       }
       // 播放/暂停图标切换
-      const playPauseIcon = document.getElementById("playPauseIcon");
+      const $playPauseIcon = $("#playPauseIcon");
       if (this.audio.paused) {
-        playPauseIcon.src = "/static/icons/play.svg";
-        playPauseIcon.alt = "播放";
+        $playPauseIcon.attr({
+          src: "/static/icons/play.svg",
+          alt: "播放"
+        });
       } else {
-        playPauseIcon.src = "/static/icons/pause.svg";
-        playPauseIcon.alt = "暂停";
+        $playPauseIcon.attr({
+          src: "/static/icons/pause.svg",
+          alt: "暂停"
+        });
       }
     });
-    this.audio.addEventListener("ended", () => {
+    $(this.audio).on("ended", () => {
       if (this.loopMode === 1) this.audio.play();
       else if (this.loopMode === 2) this.playNext();
       else if (this.loopMode === 3)
         this.playAt(Math.floor(Math.random() * this.playlist.length));
     });
-    this.audio.addEventListener("volumechange", () => {
-      const volumeSlider = document.getElementById("volumeSlider");
-      volumeSlider.value = this.audio.volume;
+    $(this.audio).on("volumechange", () => {
+      const $volumeSlider = $("#volumeSlider");
+      $volumeSlider.val(this.audio.volume);
       // 更新滑块颜色
-      volumeSlider.style.setProperty(
-        "--volume-percent",
-        this.audio.volume * 100 + "%"
-      );
+      $volumeSlider.css("--volume-percent", this.audio.volume * 100 + "%");
 
-      const muteIcon = document.getElementById("muteIcon");
+      const $muteIcon = $("#muteIcon");
       if (this.audio.muted || this.audio.volume === 0) {
-        muteIcon.src = "/static/icons/mute.svg";
-        muteIcon.alt = "静音";
+        $muteIcon.attr({
+          src: "/static/icons/mute.svg",
+          alt: "静音"
+        });
       } else {
-        muteIcon.src = "/static/icons/volume.svg";
-        muteIcon.alt = "音量";
+        $muteIcon.attr({
+          src: "/static/icons/volume.svg",
+          alt: "音量"
+        });
       }
     });
     // 初始化音量
     this.audio.volume = 1;
-    document.getElementById("volumeSlider").value = 1;
+    $("#volumeSlider").val(1);
   }
 }
 
 // 初始化播放器
 window.player = new Player();
-window.addEventListener("load", () => player.loadPlaylist());
+$(window).on("load", () => player.loadPlaylist());

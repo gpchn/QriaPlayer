@@ -1,19 +1,20 @@
 <!DOCTYPE html>
-<html lang="zh">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>QriaPlayer</title>
-    <!-- CSS引入 -->
-    <link rel="stylesheet" href="/static/css/main.css" />
-    <link rel="stylesheet" href="/static/css/scrollTo.css" />
-    <link rel="stylesheet" href="/static/css/video.css" />
-    <link rel="stylesheet" href="/static/css/modal.css" />
-    <link rel="stylesheet" href="/static/css/mobile.css" />
-    <link rel="shortcut icon" href="/static/favicon.ico" />
-  </head>
-  <body>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qria Player</title>
+    <link rel="stylesheet" href="/static/scss/main.css">
+</head>
+<body>
     <div class="container">
+      <!-- 添加隐藏的checkbox用于控制播放状态 -->
+      <input type="checkbox" id="playerStateCheckbox" style="display: none;">
+      <!-- 添加隐藏的checkbox用于控制媒体类型 -->
+      <input type="checkbox" id="mediaTypeCheckbox" style="display: none;">
+      <!-- 添加隐藏的checkbox用于控制滚动状态 -->
+      <input type="checkbox" id="scrollTriggerCheckbox" style="display: none;">
+      
       <!-- 左侧播放列表 -->
       <div class="playlist-container">
         <div class="function-buttons">
@@ -66,17 +67,17 @@
           <button id="prevBtn" title="上一曲">
             <img src="/static/icons/previous.svg" alt="上一曲" />
           </button>
-          <button id="playBtn" title="播放/暂停">
+          <button id="playBtn" title="播放/暂停" class="paused">
             <img id="playPauseIcon" src="/static/icons/play.svg" alt="播放" />
           </button>
           <button id="nextBtn" title="下一曲">
             <img src="/static/icons/next.svg" alt="下一曲" />
           </button>
-          <button id="loopBtn" title="循环模式">
+          <button id="loopBtn" title="循环模式" class="loop-list">
             <img id="loopIcon" src="/static/icons/loop-list.svg" alt="循环" />
-            <span id="loopText">全部</span>
+            <span id="loopText"></span>
           </button>
-          <div class="volume-container">
+          <div class="volume-container unmuted">
             <button id="muteBtn" title="静音">
               <img id="muteIcon" src="/static/icons/volume.svg" alt="音量" />
             </button>
@@ -121,10 +122,10 @@
         <div class="modal-body">
           <div class="modal-sidebar">
             <ul class="sidebar-menu">
-              <li class="sidebar-item active">基本设置</li>
-              <li class="sidebar-item">音频设置</li>
-              <li class="sidebar-item">界面设置</li>
-              <li class="sidebar-item">关于</li>
+              <li class="sidebar-item active" data-tab="basic-settings">基本设置</li>
+              <li class="sidebar-item" data-tab="audio-settings">音频设置</li>
+              <li class="sidebar-item" data-tab="ui-settings">界面设置</li>
+              <li class="sidebar-item" data-tab="about">关于</li>
             </ul>
           </div>
           <div class="modal-main">
@@ -159,7 +160,7 @@
           </div>
           <div class="modal-main">
             <!-- 导入功能内容区域 -->
-            <div class="import-content" id="local-import">
+            <div class="import-content active" id="local-import" style="display: block;">
               <div class="dropzone" id="fileDropzone">
                 <div class="dropzone-content">
                   <button class="action-btn" id="selectFileBtn">
@@ -179,7 +180,7 @@
               </div>
               <div class="upload-list" id="uploadList"></div>
             </div>
-            <div class="import-content" id="url-import">
+            <div class="import-content" id="url-import" style="display: none;">
               <div class="url-import-form">
                 <div class="form-group">
                   <label for="musicUrl">音乐链接</label>
@@ -208,7 +209,7 @@
                 <button class="action-btn" id="importUrlBtn">导入链接</button>
               </div>
             </div>
-            <div class="import-content" id="bilibili-import">
+            <div class="import-content" id="bilibili-import" style="display: none;">
               <div class="bilibili-import-form">
                 <div class="form-group">
                   <label for="biliUrl">B站视频链接</label>

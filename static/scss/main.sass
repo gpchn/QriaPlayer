@@ -1,0 +1,1009 @@
+// == Variables ==
+$primary-bg: #1a1a1a
+$secondary-bg: #252525
+$playlist-bg: #2d2d2d
+$item-bg: #383838
+$item-hover-bg: #454545
+$accent-color: #1db954
+$accent-color-dark: #14863b
+$text-primary: white
+$text-secondary: #aaa
+$text-tertiary: #888
+$border-color: #444
+$scrollbar-bg: #252525
+$scrollbar-thumb: #1db954
+
+// == Global Styles ==
+body
+  margin: 0
+  height: 100vh
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif
+  background: $primary-bg
+  color: $text-primary
+  display: flex
+  overflow: hidden
+
+.container
+  display: grid
+  grid-template-columns: 380px 1fr
+  gap: 0
+  width: 100%
+  height: 100vh
+  animation: fadeIn 0.5s ease
+
+// == Playlist Container ==
+.playlist-container
+  background: $playlist-bg
+  padding: 20px
+  height: calc(100vh - 40px)
+  overflow-y: auto
+  position: relative
+
+  &::-webkit-scrollbar
+    width: 8px
+    background: $scrollbar-bg
+
+  &::-webkit-scrollbar-thumb
+    background: $scrollbar-thumb
+    border-radius: 4px
+
+// == Function Buttons ==
+.function-buttons
+  display: flex
+  justify-content: flex-start
+  gap: 10px
+  margin-bottom: 10px
+
+.function-btn
+  width: 36px
+  height: 36px
+  border-radius: 50%
+  background: rgba(255, 255, 255, 0.1)
+  border: none
+  display: flex
+  align-items: center
+  justify-content: center
+  cursor: pointer
+  transition: all 0.2s ease
+
+  &:hover
+    background: $accent-color
+    transform: scale(1.1)
+
+  img
+    width: 20px
+    height: 20px
+    pointer-events: none
+
+// == Search Box ==
+#searchBox
+  width: 100%
+  padding: 12px
+  margin: 10px 0
+  background: $item-bg
+  border: 1px solid $border-color
+  border-radius: 8px
+  color: $text-primary
+  font-size: 14px
+  transition: all 0.3s ease
+
+  &:focus
+    outline: none
+    border-color: $accent-color
+    box-shadow: 0 0 0 2px rgba(29, 185, 84, 0.2)
+
+// == Playlist ==
+#playlist
+  list-style: none
+  padding: 0
+  margin: 0
+
+  li
+    padding: 10px 15px
+    cursor: pointer
+    border-radius: 6px
+    margin: 4px 0
+    background: $item-bg
+    transition: all 0.2s ease
+    display: flex
+    flex-direction: column
+
+    &:hover
+      background: $item-hover-bg
+      transform: translateX(4px)
+
+    &.playing
+      color: rgba(0, 0, 0, 0.9)
+      font-weight: 500
+      background: $accent-color
+      transform: scale(1.02)
+      box-shadow: 0 4px 12px rgba(29, 185, 84, 0.2)
+
+      .song-artist
+        color: rgba(0, 0, 0, 0.8)
+
+    &.video-item
+      border-left: 5px solid $accent-color
+
+// 使用Sass和隐藏radio按钮优化当前播放项目的定位
+#playlist
+  // 隐藏的radio按钮用于标记当前播放项目
+  .playing-radio
+    display: none
+    
+    &:checked
+      // 使用CSS选择器直接定位到当前播放项目
+      + li
+        // 可以添加当前播放项目的特殊样式
+
+.video-tag
+  display: inline-block
+  background: $accent-color
+  color: #fff
+  font-size: 11px
+  border-radius: 4px
+  padding: 1px 6px
+  margin-left: 6px
+  vertical-align: middle
+
+// == Music Player Container ==
+.music-player-container
+  display: none
+  background: $secondary-bg
+  padding: 30px
+  height: calc(100vh - 60px)
+  flex-direction: column
+  position: relative
+
+.info
+  text-align: center
+  margin-bottom: 10px
+  position: sticky
+  top: 0
+  z-index: 2
+  background: $secondary-bg
+  padding-bottom: 10px
+
+  h2
+    margin: 0 0 8px 0
+    font-size: 24px
+    letter-spacing: 1px
+
+  p
+    margin: 0
+    color: $text-secondary
+    font-size: 14px
+
+// == Progress ==
+.progress-container
+  margin: 0
+  background: $secondary-bg
+  z-index: 3
+  padding-top: 8px
+  padding-bottom: 8px
+
+.progress
+  width: 100%
+  height: 6px
+  -webkit-appearance: none
+  appearance: none
+  background: $item-bg
+  border-radius: 3px
+  cursor: pointer
+  // 使用Sass变量优化进度条背景
+  background: linear-gradient(to right, #2e7d32 0%, #2e7d32 0%, #555 0%, #555 100%)
+  background-repeat: no-repeat
+
+  &::-webkit-slider-thumb
+    -webkit-appearance: none
+    width: 16px
+    height: 16px
+    background: $accent-color
+    border-radius: 50%
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2)
+    transition: transform 0.2s ease
+
+    &:hover
+      transform: scale(1.2)
+
+// 使用Sass优化进度条时间显示
+.time-display
+  display: flex
+  justify-content: space-between
+  color: #888
+  font-size: 13px
+  margin-top: 8px
+
+// == Controls ==
+.controls
+  display: flex
+  align-items: center
+  gap: 20px
+  padding: 10px
+  background: rgba(255, 255, 255, 0.05)
+  border-radius: 30px
+  margin-top: 0
+  margin-bottom: 0
+  justify-content: center
+  position: sticky
+  bottom: 0
+  z-index: 10
+
+button
+  width: 44px
+  height: 44px
+  display: flex
+  align-items: center
+  justify-content: center
+  border: none
+  background: rgba(255, 255, 255, 0.1)
+  color: $text-primary
+  border-radius: 50%
+  cursor: pointer
+  transition: all 0.3s ease
+  padding: 0
+
+  img
+    width: 24px
+    height: 24px
+    pointer-events: none
+
+  &:hover
+    background: $accent-color
+    transform: scale(1.1)
+
+#loopBtn
+  width: auto
+  padding: 0 12px 0 8px
+  border-radius: 25px
+  font-size: 14px
+  display: flex
+  align-items: center
+  gap: 4px
+
+  img
+    width: 20px
+    height: 20px
+
+#loopText
+  color: #999
+  transition: color 0.3s
+
+  #loopBtn:hover &
+    color: #111
+
+// 优化循环模式按钮样式，通过类名控制不同状态
+.loop-off
+  #loopIcon
+    content: url('/static/icons/loop-off.svg')
+  
+  #loopText
+    &::after
+      content: "关"
+
+.loop-one
+  #loopIcon
+    content: url('/static/icons/loop-one.svg')
+  
+  #loopText
+    &::after
+      content: "单曲"
+
+.loop-list
+  #loopIcon
+    content: url('/static/icons/loop-list.svg')
+  
+  #loopText
+    &::after
+      content: "全部"
+
+.loop-random
+  #loopIcon
+    content: url('/static/icons/loop-random.svg')
+  
+  #loopText
+    &::after
+      content: "随机"
+
+.volume-container
+  display: flex
+  align-items: center
+  gap: 8px
+  background: rgba(255, 255, 255, 0.08)
+  padding: 8px 12px
+  border-radius: 25px
+
+#muteBtn
+  width: 36px
+  height: 36px
+  min-width: 36px
+  min-height: 36px
+  border-radius: 50%
+  padding: 0
+
+  img
+    width: 20px
+    height: 20px
+
+#volumeSlider
+  -webkit-appearance: none
+  appearance: none
+  background: transparent
+  width: 80px
+  height: 20px
+  margin: 0
+  padding: 0
+
+  &::-webkit-slider-runnable-track
+    width: 100%
+    height: 5px
+    border-radius: 2.5px
+    background: linear-gradient(to right, #{$accent-color-dark} 0%, #{$accent-color-dark} var(--volume-percent, 100%), #{$item-bg} var(--volume-percent, 100%), #{$item-bg} 100%)
+    cursor: pointer
+
+  &::-webkit-slider-thumb
+    -webkit-appearance: none
+    appearance: none
+    width: 12px
+    height: 12px
+    background: $accent-color
+    border-radius: 50%
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2)
+    cursor: pointer
+    margin-top: -3.5px
+    transition: all 0.2s ease
+
+    &:hover
+      transform: scale(1.2)
+
+  &::-moz-range-track
+    width: 100%
+    height: 5px
+    border-radius: 2.5px
+    background: linear-gradient(to right, #{$accent-color-dark} 0%, #{$accent-color-dark} var(--volume-percent, 100%), #{$item-bg} var(--volume-percent, 100%), #{$item-bg} 100%)
+
+  &::-moz-range-thumb
+    width: 12px
+    height: 12px
+    background: $accent-color
+    border-radius: 50%
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2)
+    border: none
+    cursor: pointer
+    transition: all 0.2s ease
+
+    &:hover
+      transform: scale(1.2)
+
+// 使用Sass和类选择器优化音量控制
+.volume-container
+  // 音量控制状态类
+  &.muted
+    #muteIcon
+      content: url('/static/icons/mute.svg')
+  
+  &.unmuted
+    #muteIcon
+      content: url('/static/icons/volume.svg')
+
+// == Lyrics ==
+.lyrics-container
+  flex: 1 1 auto
+  overflow-y: auto
+  margin: 0 0 15px 0
+  padding: 20px
+  background: rgba(0, 0, 0, 0.3)
+  border-radius: 12px
+  text-align: center
+  font-size: 18px
+  line-height: 2.2
+  scroll-behavior: smooth
+  min-height: 120px
+  max-height: none
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)
+  mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)
+
+  &::-webkit-scrollbar
+    width: 8px
+    background: $scrollbar-bg
+
+  &::-webkit-scrollbar-thumb
+    background: $scrollbar-thumb
+    border-radius: 4px
+
+.lyrics-highlight
+  color: $accent-color
+  font-weight: 600
+  transform: scale(1.05)
+  text-shadow: 0 0 10px rgba(29, 185, 84, 0.5)
+  display: inline-block
+
+// 使用Sass优化歌词高亮显示
+#lyricsBox
+  // 使用类选择器控制歌词高亮
+  .current-line
+    color: $accent-color
+    font-weight: 600
+    transform: scale(1.05)
+    text-shadow: 0 0 10px rgba(29, 185, 84, 0.5)
+    display: inline-block
+
+.song-name
+  font-size: 15px
+  margin-bottom: 3px
+
+.song-artist
+  font-size: 12px
+  color: $text-tertiary
+
+// == Welcome Container ==
+.welcome-container
+  display: flex
+  position: relative
+  height: 100%
+
+.welcome-icon
+  filter: contrast(0.85)
+  width: 50%
+  position: absolute
+  top: 50%
+  left: 50%
+  transform: translate(-50%, -50%)
+
+// 使用Sass和checkbox技巧实现欢迎界面和播放器容器的切换
+.container
+  // 隐藏的checkbox用于控制欢迎界面和播放器的切换
+  #playerStateCheckbox
+    display: none
+    
+    // 当开始播放时，隐藏欢迎界面，显示播放器
+    &:checked
+      ~ .welcome-container
+        display: none
+        
+      ~ .music-player-container
+        display: flex
+
+// == Modal ==
+.function-modal
+  position: fixed
+  top: 0
+  left: 0
+  width: 100%
+  height: 100%
+  background: rgba(0, 0, 0, 0.8)
+  display: none
+  align-items: center
+  justify-content: center
+  z-index: 1000
+  animation: fadeIn 0.3s ease
+
+.modal-content
+  background: $secondary-bg
+  border-radius: 10px
+  width: 80%
+  max-width: 1000px
+  height: 80%
+  max-height: 700px
+  display: flex
+  flex-direction: column
+  overflow: hidden
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5)
+
+.hidden-file-input
+  display: none
+
+.modal-header
+  padding: 15px 20px
+  background: $playlist-bg
+  display: flex
+  justify-content: space-between
+  align-items: center
+  border-bottom: 1px solid #333
+
+  h3
+    margin: 0
+    color: $text-primary
+    font-size: 18px
+
+.close-btn
+  width: 32px
+  height: 32px
+  background: rgba(255, 255, 255, 0.1)
+  border-radius: 50%
+  display: flex
+  align-items: center
+  justify-content: center
+  cursor: pointer
+  transition: all 0.2s ease
+
+  &:hover
+    background: rgba(255, 255, 255, 0.2)
+    transform: rotate(90deg)
+
+  img
+    width: 16px
+    height: 16px
+
+.modal-body
+  display: flex
+  flex: 1
+  overflow: hidden
+
+.modal-sidebar
+  width: 200px
+  background: #222
+  border-right: 1px solid #333
+  overflow-y: auto
+
+  &::-webkit-scrollbar,
+  .modal-main::-webkit-scrollbar
+    width: 8px
+    background: $scrollbar-bg
+
+  &::-webkit-scrollbar-thumb,
+  .modal-main::-webkit-scrollbar-thumb
+    background: $scrollbar-thumb
+    border-radius: 4px
+
+  // 隐藏的radio按钮用于控制标签页切换
+  .tab-radio
+    display: none
+    
+    &:checked + .sidebar-item
+      background: $accent-color
+      color: #000
+      font-weight: 500
+
+  // 当标签被选中时，显示对应的content
+  &:checked ~ .modal-main #local-import,
+  &:checked ~ .modal-main #url-import,
+  &:checked ~ .modal-main #bilibili-import
+    display: block
+
+.modal-main
+  flex: 1
+  padding: 20px
+  overflow-y: auto
+
+.sidebar-menu
+  list-style: none
+  padding: 0
+  margin: 0
+  z-index: 1
+
+.sidebar-item
+  padding: 15px 20px
+  cursor: pointer
+  transition: all 0.2s ease
+  color: #ccc
+  font-size: 16px
+  position: relative
+  z-index: 1
+
+  &:hover
+    background: #2a2a2a
+    color: $text-primary
+
+  &.active
+    background: $accent-color
+    color: #000
+    font-weight: 500
+
+.placeholder-text
+  color: #999
+  text-align: center
+  margin-top: 100px
+  font-size: 16px
+
+.dropzone
+  border: 2px dashed #444
+  border-radius: 8px
+  padding: 40px 20px
+  text-align: center
+  transition: all 0.3s ease
+  margin-bottom: 20px
+  background: transparent
+  display: flex
+  align-items: center
+  justify-content: center
+  min-height: 250px
+  flex-grow: 0
+
+  &:hover
+    border-color: $accent-color
+    box-shadow: 0 0 10px rgba(29, 185, 84, 0.3)
+
+  &.active
+    border-color: $accent-color
+    box-shadow: 0 0 15px rgba(29, 185, 84, 0.4)
+
+// 使用Sass和checkbox:checked技巧优化拖放区域的激活状态
+#fileDropzone
+  position: relative
+  
+  .dragover-toggle
+    position: absolute
+    opacity: 0
+    pointer-events: none
+    
+    &:checked ~ .dropzone
+      border-color: $accent-color
+      box-shadow: 0 0 15px rgba(29, 185, 84, 0.4)
+
+.dropzone-content
+  display: flex
+  flex-direction: column
+  align-items: center
+  gap: 15px
+  margin: 0 auto
+
+  p
+    margin: 5px 0
+    color: #ccc
+    font-size: 16px
+
+.import-content
+  display: flex
+  flex-direction: column
+
+  button.action-btn
+    // 重置全局按钮样式
+    width: auto
+    height: auto
+    border-radius: 8px
+
+    // 基本按钮样式
+    display: inline-block
+    padding: 10px 20px
+    margin-top: 15px
+    border: none
+
+    // 颜色和外观
+    background-color: rgba(255, 255, 255, 0.1)
+    color: #fff
+
+    // 文字样式
+    font-size: 14px
+    font-weight: normal
+    text-align: center
+    white-space: nowrap
+
+    &:hover
+      background-color: $accent-color
+      color: rgba(0, 0, 0, 0.9)
+      transform: scale(1.05)
+      box-shadow: 0 0 12px rgba(29, 185, 84, 0.6)
+
+    &:disabled
+      background-color: #333
+      color: #666
+      cursor: not-allowed
+
+.form-group
+  margin-bottom: 25px
+  position: relative
+  width: 95%
+
+  label
+    display: block
+    margin-bottom: 8px
+    color: #ccc
+    font-size: 14px
+
+  input
+    width: 100%
+    padding: 12px
+    border: 1px solid $border-color
+    background: $item-bg
+    color: $text-primary
+    border-radius: 8px
+    font-size: 14px
+    transition: all 0.3s ease
+
+    &:focus
+      outline: none
+      border-color: $accent-color
+      box-shadow: 0 0 0 2px rgba(29, 185, 84, 0.2)
+
+.upload-list
+  margin-top: 20px
+  margin-bottom: 20px
+
+.upload-item
+  display: flex
+  align-items: center
+  background: #333
+  border-radius: 6px
+  padding: 10px 15px
+  margin-bottom: 10px
+
+.upload-item-name
+  flex: 1
+  margin-right: 15px
+  white-space: nowrap
+  overflow: hidden
+  text-overflow: ellipsis
+
+.upload-item-status
+  font-size: 12px
+  color: $accent-color
+
+.upload-item-error
+  color: #e74c3c
+
+// 使用Sass优化设置和导入模态框的显示和隐藏
+#settingsModal,
+#importModal
+  // 使用checkbox:checked技巧控制模态框显示
+  display: none
+  
+  // 隐藏的checkbox用于控制模态框显示
+  .modal-toggle
+    display: none
+    
+    &:checked ~ &
+      display: flex
+
+// == Import Tabs ==
+#local-import
+  display: block
+
+.bili-result
+  display: none
+  margin-top: 20px
+  padding: 15px
+  background: $item-bg
+  border-radius: 8px
+  border: 1px solid $border-color
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2)
+  animation: fadeIn 0.3s ease
+
+.url-import-form,
+.bilibili-import-form
+  max-width: 600px
+  margin: 0 auto
+  padding: 0 20px
+
+.import-content
+  animation: fadeIn 0.3s ease
+  display: none
+  padding: 0 20px 20px 20px
+  border: none
+  overflow-y: auto
+
+  &.active
+    display: block
+
+.bili-video-info
+  display: flex
+  flex-wrap: wrap
+  margin-bottom: 15px
+  background: $item-bg
+  padding: 15px
+  border-radius: 8px
+  align-items: center
+
+.bili-video-cover
+  width: 120px
+  height: 75px
+  object-fit: cover
+  border-radius: 4px
+  margin-right: 15px
+
+.bili-video-details
+  flex: 1
+
+.bili-video-title
+  font-weight: 500
+  margin-bottom: 5px
+
+.bili-video-uploader
+  font-size: 12px
+  color: #aaa
+
+.bili-audio-options
+  margin-top: 15px
+
+.bili-audio-option
+  display: flex
+  align-items: center
+  margin-bottom: 10px
+  padding: 10px
+  background: #444
+  border-radius: 4px
+  cursor: pointer
+
+  &:hover
+    background: #555
+
+  &.selected
+    background: rgba(29, 185, 84, 0.3)
+    border: 1px solid $accent-color
+
+// == Scroll To Buttons ==
+#scrollTopBtn,
+#scrollToPlayingBtn
+  position: fixed
+  z-index: 200
+  width: 44px
+  height: 44px
+  border-radius: 50%
+  background: $accent-color
+  color: #fff
+  border: none
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18)
+  display: none
+  align-items: center
+  justify-content: center
+  transition: opacity 0.3s, transform 0.3s
+  opacity: 0
+  cursor: pointer
+  right: 0
+  bottom: 0
+
+  @media (max-width: 900px)
+    right: 8px
+    left: auto
+
+  &.show
+    display: flex
+    opacity: 1
+    transform: translateY(0)
+
+  img
+    width: 22px
+    height: 22px
+
+  &:hover
+    background: $accent-color-dark
+
+// 使用Sass优化，添加:checked伪类技巧实现纯CSS控制显示隐藏
+.playlist-container
+  position: relative
+
+.scroll-trigger
+  position: absolute
+  top: 120px
+  left: 0
+  width: 100%
+  height: 1px
+  pointer-events: none
+  
+  &::after
+    content: ""
+    position: absolute
+    top: 0
+    left: 0
+    width: 100%
+    height: 1px
+    background: transparent
+
+#scrollTriggerCheckbox
+  position: absolute
+  opacity: 0
+  pointer-events: none
+  
+  &:checked ~ #scrollTopBtn
+    display: flex
+    opacity: 1
+    transform: translateY(0)
+
+#scrollTopBtn
+  @media (max-width: 900px)
+    bottom: 12px
+
+#scrollToPlayingBtn
+  bottom: 52px
+
+  @media (max-width: 900px)
+    bottom: 64px
+
+// == Video Player ==
+.video-player-container
+  display: none
+  position: relative
+  background: $secondary-bg
+  padding: 30px
+  height: calc(100vh - 60px)
+
+.video-player
+  width: 90%
+  border-radius: 6px
+  position: absolute
+  top: 50%
+  left: 50%
+  transform: translate(-50%, -50%)
+
+// 使用Sass优化视频播放器和音乐播放器的切换
+#mediaTypeCheckbox
+  display: none
+  
+  // 当播放视频时的样式
+  &:checked
+    ~ .music-player-container
+      display: none
+      
+    ~ .video-player-container
+      display: block
+
+// == Animations ==
+@keyframes fadeIn
+  from
+    opacity: 0
+    transform: translateY(10px)
+  
+  to
+    opacity: 1
+    transform: translateY(0)
+
+// == Responsive Design ==
+@media (max-width: 768px)
+  .container
+    grid-template-columns: 1fr
+
+  .playlist-container
+    display: none
+
+  .music-player-container
+    height: 100vh
+    padding: 20px
+
+  .controls
+    padding: 10px
+    gap: 10px
+
+  button
+    width: 40px
+    height: 40px
+
+  .volume-container
+    padding: 6px 12px
+
+  #volumeSlider
+    width: 60px
+
+  // 响应式设计下的导入界面优化
+  .import-content
+    padding: 0 10px 10px 10px
+    max-height: calc(100vh - 250px)
+    
+  .bili-video-info
+    flex-direction: column
+    align-items: flex-start
+    gap: 10px
+
+// 使用Sass优化播放/暂停按钮状态
+#playBtn
+  // 播放状态
+  &.playing
+    #playPauseIcon
+      content: url('/static/icons/pause.svg')
+      
+  // 暂停状态
+  &.paused
+    #playPauseIcon
+      content: url('/static/icons/play.svg')
+
+// 使用Sass和类选择器优化播放按钮状态
+.playing
+  #playPauseIcon
+    content: url('/static/icons/pause.svg')
+    alt: "暂停"
+
+.paused
+  #playPauseIcon
+    content: url('/static/icons/play.svg')
+    alt: "播放"
+
+// 使用Sass优化音量按钮状态
+#muteBtn
+  // 静音状态
+  &.muted
+    #muteIcon
+      content: url('/static/icons/mute.svg')
+      
+  // 有音量状态
+  &.unmuted
+    #muteIcon
+      content: url('/static/icons/volume.svg')

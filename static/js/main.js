@@ -1,22 +1,69 @@
-// 播放器核心状态与控制
+/**
+ * 播放器核心类 - 负责音频/视频播放控制、播放列表管理、歌词显示等功能
+ * @class Player
+ */
 class Player {
+  /**
+   * 初始化播放器实例
+   * @constructor
+   */
   constructor() {
+    // 日志系统初始化
+    this.logger = {
+      debug: (msg, data) => console.log(`[DEBUG] ${msg}`, data || ''),
+      info: (msg, data) => console.info(`[INFO] ${msg}`, data || ''),
+      warn: (msg, data) => console.warn(`[WARN] ${msg}`, data || ''),
+      error: (msg, error) => console.error(`[ERROR] ${msg}`, error || '')
+    };
+    
+    this.logger.info('初始化播放器实例...');
+    
+    // 核心组件初始化
     this.audio = new Audio();
     this.playlist = [];
     this.currentIndex = -1;
     this.lyrics = [];
     this.lyricsTimer = null;
-    this.loopMode = 2; // 0:无, 1:单曲, 2:列表, 3:随机
+    
+    // 播放控制状态
+    this.loopMode = 2; // 0:无循环, 1:单曲循环, 2:列表循环, 3:随机播放
     this.isUserScrollingLyrics = false; // 标记用户是否正在滚动歌词
     this.userScrollingTimeout = null; // 用户滚动超时定时器
     this.hasPlayed = false; // 标记用户是否已开始播放
+    
+    // 常量配置
+    this.config = {
+      userScrollResetTimeout: 1500, // 用户停止滚动后恢复自动滚动的延迟时间(毫秒)
+      mouseUpResetTimeout: 800, // 鼠标释放后恢复自动滚动的延迟时间(毫秒)
+      autoSaveInterval: 30000, // 自动保存播放状态的间隔时间(毫秒)
+      playingItemCheckInterval: 2 // 检查当前播放歌曲是否在可视区域内的间隔(秒)
+    };
+    
+    // DOM元素缓存
+    this.domElements = {};
+    
+    // 初始化事件监听
     this.initEvents();
+    
+    this.logger.info('播放器实例初始化完成');
   }
 
+  /**
+   * 切换循环播放模式
+   * 循环模式包括: 无循环、单曲循环、列表循环、随机播放
+   */
   toggleLoopMode() {
+    // 更新循环模式 (0->1->2->3->0)
     this.loopMode = (this.loopMode + 1) % 4;
+    
+    // 设置音频循环属性 (仅在单曲循环模式下启用)
     this.audio.loop = this.loopMode === 1;
-    const txts = ["关", "单曲", "全部", "随机"];
+    
+    // 循环模式文本描述
+    const modeTexts = ["无循环", "单曲循环", "列表循环", "随机播放"];
+    const modeShortTexts = ["关", "单曲", "全部", "随机"];
+    
+    this.logger.info(`切换循环模式为: ${modeTexts[this.loopMode]}`);
     
     // 使用类切换代替直接修改src和textContent
     const loopBtn = document.getElementById("loopBtn");

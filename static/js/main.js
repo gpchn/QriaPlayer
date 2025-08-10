@@ -74,9 +74,9 @@ class Player {
     // 添加当前循环模式类
     loopBtn.classList.add(loopClasses[this.loopMode]);
     
-    // 更新alt属性
+    // 更新aria-label属性
     const loopIcon = document.getElementById("loopIcon");
-    loopIcon.alt = "循环" + txts[this.loopMode];
+    loopIcon.setAttribute("aria-label", "循环" + modeTexts[this.loopMode]);
   }
 
   toggleMute() {

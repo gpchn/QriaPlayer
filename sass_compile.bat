@@ -1,1 +1,1 @@
-sass static/scss/main.sass static/scss/main.css
+sass static/css/main.sass static/css/main.css

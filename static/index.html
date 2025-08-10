@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Qria Player</title>
-    <link rel="stylesheet" href="/static/scss/main.css">
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/font-awesome.all.min.css">
 </head>
 <body>
     <div class="container">
@@ -19,10 +20,10 @@
       <div class="playlist-container">
         <div class="function-buttons">
           <button class="function-btn" id="settingsBtn" title="设置">
-            <img src="/static/icons/settings.svg" alt="设置" />
+            <i class="fas fa-cog"></i>
           </button>
           <button class="function-btn" id="importBtn" title="导入">
-            <img src="/static/icons/import.svg" alt="导入" />
+            <i class="fas fa-file-import"></i>
           </button>
         </div>
         <input type="search" id="searchBox" placeholder="搜索歌曲..." />
@@ -32,10 +33,10 @@
           title="定位到当前播放歌曲"
           aria-label="定位到当前播放歌曲"
         >
-          <img src="/static/icons/now-playing.svg" alt="定位到当前播放歌曲" />
+          <i class="fas fa-arrow-down"></i>
         </button>
         <button id="scrollTopBtn" title="回到顶部" aria-label="回到顶部">
-          <img src="/static/icons/arrow-up.svg" alt="回到顶部" />
+          <i class="fas fa-arrow-up"></i>
         </button>
       </div>
       <!-- 右侧播放器 -->
@@ -65,21 +66,21 @@
         </div>
         <div class="controls">
           <button id="prevBtn" title="上一曲">
-            <img src="/static/icons/previous.svg" alt="上一曲" />
+            <i class="fas fa-step-backward"></i>
           </button>
           <button id="playBtn" title="播放/暂停" class="paused">
-            <img id="playPauseIcon" src="/static/icons/play.svg" alt="播放" />
+            <i class="fas fa-play" id="playPauseIcon"></i>
           </button>
           <button id="nextBtn" title="下一曲">
-            <img src="/static/icons/next.svg" alt="下一曲" />
+            <i class="fas fa-step-forward"></i>
           </button>
           <button id="loopBtn" title="循环模式" class="loop-list">
-            <img id="loopIcon" src="/static/icons/loop-list.svg" alt="循环" />
+            <i class="fas fa-repeat" id="loopIcon"></i>
             <span id="loopText"></span>
           </button>
           <div class="volume-container unmuted">
             <button id="muteBtn" title="静音">
-              <img id="muteIcon" src="/static/icons/volume.svg" alt="音量" />
+              <i class="fas fa-volume-up" id="muteIcon"></i>
             </button>
             <input
               type="range"

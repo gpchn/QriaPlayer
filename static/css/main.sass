@@ -12,6 +12,7 @@ $text-tertiary: #888
 $border-color: #444
 $scrollbar-bg: #252525
 $scrollbar-thumb: #1db954
+$icon-color: black
 
 // == Global Styles ==
 body
@@ -55,8 +56,8 @@ body
   margin-bottom: 10px
 
 .function-btn
-  width: 36px
-  height: 36px
+  width: 42px
+  height: 42px
   border-radius: 50%
   background: rgba(255, 255, 255, 0.1)
   border: none
@@ -65,14 +66,14 @@ body
   justify-content: center
   cursor: pointer
   transition: all 0.2s ease
+  font-size: 18px
+  color: $icon-color
 
   &:hover
     background: $accent-color
-    transform: scale(1.1)
+    transform: scale(1.05)
 
-  img
-    width: 20px
-    height: 20px
+  i
     pointer-events: none
 
 // == Search Box ==
@@ -230,27 +231,26 @@ body
   z-index: 10
 
 button
-  width: 44px
-  height: 44px
+  width: 50px
+  height: 50px
   display: flex
   align-items: center
   justify-content: center
   border: none
   background: rgba(255, 255, 255, 0.1)
-  color: $text-primary
+  color: $icon-color
   border-radius: 50%
   cursor: pointer
   transition: all 0.3s ease
   padding: 0
+  font-size: 20px
 
-  img
-    width: 24px
-    height: 24px
+  i
     pointer-events: none
 
   &:hover
     background: $accent-color
-    transform: scale(1.1)
+    transform: scale(1.05)
 
 #loopBtn
   width: auto
@@ -260,10 +260,10 @@ button
   display: flex
   align-items: center
   gap: 4px
+  color: $icon-color
 
-  img
-    width: 20px
-    height: 20px
+  i
+    font-size: 16px
 
 #loopText
   color: #999
@@ -274,36 +274,32 @@ button
 
 // 优化循环模式按钮样式，通过类名控制不同状态
 .loop-off
-  #loopIcon
-    content: url('/static/icons/loop-off.svg')
+  #loopIcon::before
+    content: "\f05e" // fa-ban - 表示禁止循环
   
-  #loopText
-    &::after
-      content: "关"
+  #loopText::after
+    content: "关闭"
 
 .loop-one
-  #loopIcon
-    content: url('/static/icons/loop-one.svg')
+  #loopIcon::before
+    content: "\f0e2" // fa-arrow-rotate-left - 表示单曲循环
   
-  #loopText
-    &::after
-      content: "单曲"
+  #loopText::after
+    content: "单曲"
 
 .loop-list
-  #loopIcon
-    content: url('/static/icons/loop-list.svg')
+  #loopIcon::before
+    content: "\f363" // fa-repeat - 表示列表循环
   
-  #loopText
-    &::after
-      content: "全部"
+  #loopText::after
+    content: "全部"
 
 .loop-random
-  #loopIcon
-    content: url('/static/icons/loop-random.svg')
+  #loopIcon::before
+    content: "\f074" // fa-shuffle - 表示随机播放
   
-  #loopText
-    &::after
-      content: "随机"
+  #loopText::after
+    content: "随机"
 
 .volume-container
   display: flex
@@ -314,10 +310,10 @@ button
   border-radius: 25px
 
 #muteBtn
-  width: 36px
-  height: 36px
-  min-width: 36px
-  min-height: 36px
+  width: 40px
+  height: 40px
+  min-width: 40px
+  min-height: 40px
   border-radius: 50%
   padding: 0
 
@@ -377,14 +373,40 @@ button
 
 // 使用Sass和类选择器优化音量控制
 .volume-container
-  // 音量控制状态类
-  &.muted
-    #muteIcon
-      content: url('/static/icons/mute.svg')
+  // 音量控制状态类 - 根据音量大小自动切换图标
+  &.volume-mute
+    #muteIcon::before
+      content: "\f6a9" // fa-volume-xmark
   
-  &.unmuted
-    #muteIcon
-      content: url('/static/icons/volume.svg')
+  &.volume-down
+    #muteIcon::before
+      content: "\f027" // fa-volume-low
+  
+  &.volume 
+    #muteIcon::before
+      content: "\f028" // fa-volume
+  
+  &.volume-up
+    #muteIcon::before
+      content: "\f028" // fa-volume-up
+
+// 播放/暂停按钮状态
+#playBtn
+  &.playing
+    #playPauseIcon::before
+      content: "\f04c" // fa-pause
+  
+  &.paused
+    #playPauseIcon::before
+      content: "\f04b" // fa-play
+
+.playing
+  #playPauseIcon::before
+    content: "\f04c" // fa-pause
+
+.paused
+  #playPauseIcon::before
+    content: "\f04b" // fa-play
 
 // == Lyrics ==
 .lyrics-container
@@ -507,8 +529,8 @@ button
     font-size: 18px
 
 .close-btn
-  width: 32px
-  height: 32px
+  width: 36px
+  height: 36px
   background: rgba(255, 255, 255, 0.1)
   border-radius: 50%
   display: flex
@@ -516,10 +538,15 @@ button
   justify-content: center
   cursor: pointer
   transition: all 0.2s ease
+  font-size: 18px
+  color: $icon-color
 
   &:hover
     background: rgba(255, 255, 255, 0.2)
     transform: rotate(90deg)
+
+  i
+    pointer-events: none
 
   img
     width: 16px
@@ -826,8 +853,8 @@ button
 #scrollToPlayingBtn
   position: fixed
   z-index: 200
-  width: 44px
-  height: 44px
+  width: 48px
+  height: 48px
   border-radius: 50%
   background: $accent-color
   color: #fff
@@ -972,38 +999,3 @@ button
     flex-direction: column
     align-items: flex-start
     gap: 10px
-
-// 使用Sass优化播放/暂停按钮状态
-#playBtn
-  // 播放状态
-  &.playing
-    #playPauseIcon
-      content: url('/static/icons/pause.svg')
-      
-  // 暂停状态
-  &.paused
-    #playPauseIcon
-      content: url('/static/icons/play.svg')
-
-// 使用Sass和类选择器优化播放按钮状态
-.playing
-  #playPauseIcon
-    content: url('/static/icons/pause.svg')
-    alt: "暂停"
-
-.paused
-  #playPauseIcon
-    content: url('/static/icons/play.svg')
-    alt: "播放"
-
-// 使用Sass优化音量按钮状态
-#muteBtn
-  // 静音状态
-  &.muted
-    #muteIcon
-      content: url('/static/icons/mute.svg')
-      
-  // 有音量状态
-  &.unmuted
-    #muteIcon
-      content: url('/static/icons/volume.svg')

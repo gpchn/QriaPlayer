@@ -42,8 +42,8 @@ body {
 }
 
 .function-btn {
-  width: 42px;
-  height: 42px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.1);
   border: none;
@@ -52,14 +52,14 @@ body {
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-size: 18px;
-  color: black;
 }
 .function-btn:hover {
   background: #1db954;
-  transform: scale(1.05);
+  transform: scale(1.1);
 }
-.function-btn i {
+.function-btn img {
+  width: 20px;
+  height: 20px;
   pointer-events: none;
 }
 
@@ -212,26 +212,27 @@ body {
 }
 
 button {
-  width: 50px;
-  height: 50px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
   background: rgba(255, 255, 255, 0.1);
-  color: black;
+  color: white;
   border-radius: 50%;
   cursor: pointer;
   transition: all 0.3s ease;
   padding: 0;
-  font-size: 20px;
 }
-button i {
+button img {
+  width: 24px;
+  height: 24px;
   pointer-events: none;
 }
 button:hover {
   background: #1db954;
-  transform: scale(1.05);
+  transform: scale(1.1);
 }
 
 #loopBtn {
@@ -242,10 +243,10 @@ button:hover {
   display: flex;
   align-items: center;
   gap: 4px;
-  color: black;
 }
-#loopBtn i {
-  font-size: 16px;
+#loopBtn img {
+  width: 20px;
+  height: 20px;
 }
 
 #loopText {
@@ -256,29 +257,29 @@ button:hover {
   color: #111;
 }
 
-.loop-off #loopIcon::before {
-  content: "\f05e";
+.loop-off #loopIcon {
+  content: url("/static/icons/loop-off.svg");
 }
 .loop-off #loopText::after {
-  content: "关闭";
+  content: "关";
 }
 
-.loop-one #loopIcon::before {
-  content: "\f0e2";
+.loop-one #loopIcon {
+  content: url("/static/icons/loop-one.svg");
 }
 .loop-one #loopText::after {
   content: "单曲";
 }
 
-.loop-list #loopIcon::before {
-  content: "\f363";
+.loop-list #loopIcon {
+  content: url("/static/icons/loop-list.svg");
 }
 .loop-list #loopText::after {
   content: "全部";
 }
 
-.loop-random #loopIcon::before {
-  content: "\f074";
+.loop-random #loopIcon {
+  content: url("/static/icons/loop-random.svg");
 }
 .loop-random #loopText::after {
   content: "随机";
@@ -294,10 +295,10 @@ button:hover {
 }
 
 #muteBtn {
-  width: 40px;
-  height: 40px;
-  min-width: 40px;
-  min-height: 40px;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
   border-radius: 50%;
   padding: 0;
 }
@@ -357,32 +358,11 @@ button:hover {
   transform: scale(1.2);
 }
 
-.volume-container.volume-mute #muteIcon::before {
-  content: "\f6a9";
+.volume-container.muted #muteIcon {
+  content: url("/static/icons/mute.svg");
 }
-.volume-container.volume-down #muteIcon::before {
-  content: "\f027";
-}
-.volume-container.volume #muteIcon::before {
-  content: "\f028";
-}
-.volume-container.volume-up #muteIcon::before {
-  content: "\f028";
-}
-
-#playBtn.playing #playPauseIcon::before {
-  content: "\f04c";
-}
-#playBtn.paused #playPauseIcon::before {
-  content: "\f04b";
-}
-
-.playing #playPauseIcon::before {
-  content: "\f04c";
-}
-
-.paused #playPauseIcon::before {
-  content: "\f04b";
+.volume-container.unmuted #muteIcon {
+  content: url("/static/icons/volume.svg");
 }
 
 .lyrics-container {
@@ -507,8 +487,8 @@ button:hover {
 }
 
 .close-btn {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 50%;
   display: flex;
@@ -516,15 +496,10 @@ button:hover {
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-size: 18px;
-  color: black;
 }
 .close-btn:hover {
   background: rgba(255, 255, 255, 0.2);
   transform: rotate(90deg);
-}
-.close-btn i {
-  pointer-events: none;
 }
 .close-btn img {
   width: 16px;
@@ -847,8 +822,8 @@ button:hover {
 #scrollToPlayingBtn {
   position: fixed;
   z-index: 200;
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: #1db954;
   color: #fff;
@@ -1005,6 +980,29 @@ button:hover {
     align-items: flex-start;
     gap: 10px;
   }
+}
+#playBtn.playing #playPauseIcon {
+  content: url("/static/icons/pause.svg");
+}
+#playBtn.paused #playPauseIcon {
+  content: url("/static/icons/play.svg");
+}
+
+.playing #playPauseIcon {
+  content: url("/static/icons/pause.svg");
+  alt: "暂停";
+}
+
+.paused #playPauseIcon {
+  content: url("/static/icons/play.svg");
+  alt: "播放";
+}
+
+#muteBtn.muted #muteIcon {
+  content: url("/static/icons/mute.svg");
+}
+#muteBtn.unmuted #muteIcon {
+  content: url("/static/icons/volume.svg");
 }
 
 /*# sourceMappingURL=main.css.map */

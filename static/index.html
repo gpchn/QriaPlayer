@@ -20,10 +20,10 @@
       <div class="playlist-container">
         <div class="function-buttons">
           <button class="function-btn" id="settingsBtn" title="设置">
-            <i class="fas fa-cog"></i>
+            <i class="fa-solid fa-cog"></i>
           </button>
           <button class="function-btn" id="importBtn" title="导入">
-            <i class="fas fa-file-import"></i>
+            <i class="fa-solid fa-file-import"></i>
           </button>
         </div>
         <input type="search" id="searchBox" placeholder="搜索歌曲..." />
@@ -33,10 +33,10 @@
           title="定位到当前播放歌曲"
           aria-label="定位到当前播放歌曲"
         >
-          <i class="fas fa-arrow-down"></i>
+          <i class="fa-solid fa-crosshairs"></i>
         </button>
         <button id="scrollTopBtn" title="回到顶部" aria-label="回到顶部">
-          <i class="fas fa-arrow-up"></i>
+          <i class="fa-solid fa-arrow-up"></i>
         </button>
       </div>
       <!-- 右侧播放器 -->
@@ -66,21 +66,21 @@
         </div>
         <div class="controls">
           <button id="prevBtn" title="上一曲">
-            <i class="fas fa-step-backward"></i>
+            <i class="fa-solid fa-step-backward"></i>
           </button>
           <button id="playBtn" title="播放/暂停" class="paused">
-            <i class="fas fa-play" id="playPauseIcon"></i>
+            <i class="fa-solid fa-play" id="playPauseIcon"></i>
           </button>
           <button id="nextBtn" title="下一曲">
-            <i class="fas fa-step-forward"></i>
+            <i class="fa-solid fa-step-forward"></i>
           </button>
           <button id="loopBtn" title="循环模式" class="loop-list">
-            <i class="fas fa-repeat" id="loopIcon"></i>
+            <i class="fa-solid fa-repeat" id="loopIcon"></i>
             <span id="loopText"></span>
           </button>
           <div class="volume-container unmuted">
             <button id="muteBtn" title="静音">
-              <i class="fas fa-volume-up" id="muteIcon"></i>
+              <i class="fa-solid fa-volume-up" id="muteIcon"></i>
             </button>
             <input
               type="range"
@@ -116,8 +116,8 @@
       <div class="modal-content">
         <div class="modal-header">
           <h3>设置</h3>
-          <button class="close-btn" id="closeSettingsBtn">
-            <img src="/static/icons/x.svg" alt="关闭" />
+          <button class="close-btn" id="closeSettingsBtn" title="关闭设置">
+            <i class="fa-solid fa-times"></i>
           </button>
         </div>
         <div class="modal-body">
@@ -145,8 +145,8 @@
       <div class="modal-content">
         <div class="modal-header">
           <h3>导入</h3>
-          <button class="close-btn" id="closeImportBtn">
-            <img src="/static/icons/x.svg" alt="关闭" />
+          <button class="close-btn" id="closeImportBtn" title="关闭导入">
+            <i class="fa-solid fa-times"></i>
           </button>
         </div>
         <div class="modal-body">

@@ -10,42 +10,42 @@ class Player {
   constructor() {
     // 日志系统初始化
     this.logger = {
-      debug: (msg, data) => console.log(`[DEBUG] ${msg}`, data || ''),
-      info: (msg, data) => console.info(`[INFO] ${msg}`, data || ''),
-      warn: (msg, data) => console.warn(`[WARN] ${msg}`, data || ''),
-      error: (msg, error) => console.error(`[ERROR] ${msg}`, error || '')
+      debug: (msg, data) => console.log(`[DEBUG] ${msg}`, data || ""),
+      info: (msg, data) => console.info(`[INFO] ${msg}`, data || ""),
+      warn: (msg, data) => console.warn(`[WARN] ${msg}`, data || ""),
+      error: (msg, error) => console.error(`[ERROR] ${msg}`, error || ""),
     };
-    
-    this.logger.info('初始化播放器实例...');
-    
+
+    this.logger.info("初始化播放器实例...");
+
     // 核心组件初始化
     this.audio = new Audio();
     this.playlist = [];
     this.currentIndex = -1;
     this.lyrics = [];
     this.lyricsTimer = null;
-    
+
     // 播放控制状态
     this.loopMode = 2; // 0:无循环, 1:单曲循环, 2:列表循环, 3:随机播放
     this.isUserScrollingLyrics = false; // 标记用户是否正在滚动歌词
     this.userScrollingTimeout = null; // 用户滚动超时定时器
     this.hasPlayed = false; // 标记用户是否已开始播放
-    
+
     // 常量配置
     this.config = {
       userScrollResetTimeout: 1500, // 用户停止滚动后恢复自动滚动的延迟时间(毫秒)
       mouseUpResetTimeout: 800, // 鼠标释放后恢复自动滚动的延迟时间(毫秒)
       autoSaveInterval: 30000, // 自动保存播放状态的间隔时间(毫秒)
-      playingItemCheckInterval: 2 // 检查当前播放歌曲是否在可视区域内的间隔(秒)
+      playingItemCheckInterval: 2, // 检查当前播放歌曲是否在可视区域内的间隔(秒)
     };
-    
+
     // DOM元素缓存
     this.domElements = {};
-    
+
     // 初始化事件监听
     this.initEvents();
-    
-    this.logger.info('播放器实例初始化完成');
+
+    this.logger.info("播放器实例初始化完成");
   }
 
   /**
@@ -67,25 +67,25 @@ class Player {
   toggleLoopMode() {
     // 更新循环模式 (0->1->2->3->0)
     this.loopMode = (this.loopMode + 1) % 4;
-    
+
     // 设置音频循环属性 (仅在单曲循环模式下启用)
     this.audio.loop = this.loopMode === 1;
-    
+
     // 循环模式文本描述
     const modeTexts = ["无循环", "单曲循环", "列表循环", "随机播放"];
     const modeShortTexts = ["关", "单曲", "全部", "随机"];
-    
+
     this.logger.info(`切换循环模式为: ${modeTexts[this.loopMode]}`);
-    
+
     // 使用类切换代替直接修改src和textContent
     const loopBtn = document.getElementById("loopBtn");
     const loopClasses = ["loop-off", "loop-one", "loop-list", "loop-random"];
-    
+
     // 移除所有循环模式类
     loopBtn.classList.remove(...loopClasses);
     // 添加当前循环模式类
     loopBtn.classList.add(loopClasses[this.loopMode]);
-    
+
     // 更新aria-label属性
     const loopIcon = document.getElementById("loopIcon");
     loopIcon.setAttribute("aria-label", "循环" + modeTexts[this.loopMode]);
@@ -129,20 +129,22 @@ class Player {
   formatTime(sec) {
     // 处理非法输入
     if (isNaN(sec) || sec < 0) return "0:00";
-    
+
     // 计算时分秒
     const totalSeconds = Math.floor(sec);
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
-    
+
     // 补零函数，确保兼容性
     const pad = (num) => {
-      return num.toString().padStart ? 
-        num.toString().padStart(2, "0") : 
-        (num < 10 ? "0" + num : num);
+      return num.toString().padStart
+        ? num.toString().padStart(2, "0")
+        : num < 10
+        ? "0" + num
+        : num;
     };
-    
+
     // 根据小时数决定显示格式
     if (hours > 0) {
       // 格式: H:MM:SS (例如: 1:03:45 或 12:03:45)
@@ -155,7 +157,7 @@ class Player {
 
   initEvents() {
     console.log("初始化事件监听器...");
-    
+
     // 定期保存播放状态（每 30 秒）
     setInterval(() => {
       if (this.currentIndex !== -1) {
@@ -171,7 +173,7 @@ class Player {
     // 等待DOM元素加载完成再绑定事件
     const attachButtonEvents = () => {
       console.log("尝试绑定按钮事件...");
-      
+
       // 设置播放按钮初始状态
       const playBtn = document.getElementById("playBtn");
       if (playBtn) {
@@ -190,7 +192,7 @@ class Player {
           ) {
             console.log("视频暂停，保存播放状态");
             this.savePlayState();
-            
+
             // 更新播放按钮状态
             this.updatePlayButtonState("paused");
           }
@@ -205,15 +207,16 @@ class Player {
           ) {
             console.log("视频结束，保存播放状态");
             this.savePlayState();
-            
+
             // 更新播放按钮状态
             this.updatePlayButtonState("paused");
-            
+
             // 处理视频循环播放
             if (this.loopMode === 1) {
-              videoPlayer.play().catch(error => console.error("循环播放失败:", error));
-            }
-            else if (this.loopMode === 2) this.playNext();
+              videoPlayer
+                .play()
+                .catch((error) => console.error("循环播放失败:", error));
+            } else if (this.loopMode === 2) this.playNext();
             else if (this.loopMode === 3)
               this.playAt(Math.floor(Math.random() * this.playlist.length));
           }
@@ -271,12 +274,16 @@ class Player {
         function updateScrollButtonsPos() {
           const rect = playlistContainer.getBoundingClientRect();
           if (scrollTopBtn) {
-            scrollTopBtn.style.right = window.innerWidth - rect.right + 16 + "px";
-            scrollTopBtn.style.bottom = window.innerHeight - rect.bottom + 24 + "px";
+            scrollTopBtn.style.right =
+              window.innerWidth - rect.right + 16 + "px";
+            scrollTopBtn.style.bottom =
+              window.innerHeight - rect.bottom + 24 + "px";
           }
           if (scrollToPlayingBtn) {
-            scrollToPlayingBtn.style.right = window.innerWidth - rect.right + 16 + "px";
-            scrollToPlayingBtn.style.bottom = window.innerHeight - rect.bottom + 76 + "px"; // 在顶部按钮上方
+            scrollToPlayingBtn.style.right =
+              window.innerWidth - rect.right + 16 + "px";
+            scrollToPlayingBtn.style.bottom =
+              window.innerHeight - rect.bottom + 76 + "px"; // 在顶部按钮上方
           }
         }
 
@@ -287,13 +294,13 @@ class Player {
         playlistContainer.addEventListener("scroll", () => {
           // 返回到当前播放歌曲按钮显示逻辑
           this.updateScrollToPlayingButton();
-          
+
           // 触发滚动状态改变事件，用于更新checkbox状态
-          const scrollEvent = new CustomEvent('playlistScroll', {
-            detail: { scrollTop: playlistContainer.scrollTop }
+          const scrollEvent = new CustomEvent("playlistScroll", {
+            detail: { scrollTop: playlistContainer.scrollTop },
           });
           document.dispatchEvent(scrollEvent);
-          
+
           // 直接控制回到顶部按钮显示/隐藏
           if (scrollTopBtn) {
             if (playlistContainer.scrollTop > 120) {
@@ -306,9 +313,11 @@ class Player {
       }
 
       // 使用CustomEvent监听滚动状态变化
-      document.addEventListener('playlistScroll', (e) => {
+      document.addEventListener("playlistScroll", (e) => {
         // 更新回到顶部按钮checkbox状态
-        const scrollTriggerCheckbox = document.getElementById("scrollTriggerCheckbox");
+        const scrollTriggerCheckbox = document.getElementById(
+          "scrollTriggerCheckbox"
+        );
         if (scrollTriggerCheckbox) {
           scrollTriggerCheckbox.checked = e.detail.scrollTop > 120;
         }
@@ -326,11 +335,14 @@ class Player {
         scrollToPlayingBtn.onclick = () => {
           const playingElement = document.querySelector("#playlist li.playing");
           if (playingElement && playlistContainer) {
-            playingElement.scrollIntoView({ behavior: "smooth", block: "center" });
+            playingElement.scrollIntoView({
+              behavior: "smooth",
+              block: "center",
+            });
           }
         };
       }
-      
+
       // 进度条
       const progressBar = document.getElementById("progressBar");
       if (progressBar) {
@@ -338,7 +350,7 @@ class Player {
           this.seek(e.target.value);
         });
       }
-      
+
       // 音量
       const volumeSlider = document.getElementById("volumeSlider");
       if (volumeSlider) {
@@ -351,32 +363,32 @@ class Player {
         // 初始设置滑块颜色
         volumeSlider.style.setProperty("--volume-percent", "100%");
       }
-      
+
       // 控制按钮
       const prevBtn = document.getElementById("prevBtn");
       const nextBtn = document.getElementById("nextBtn");
       const loopBtn = document.getElementById("loopBtn");
       const muteBtn = document.getElementById("muteBtn");
-      
+
       // 确保playBtn存在后再绑定事件
       if (playBtn) {
         playBtn.onclick = () => this.togglePlay();
       }
-      
+
       // 为循环按钮添加点击事件监听器
       if (loopBtn) {
         loopBtn.addEventListener("click", () => this.toggleLoopMode());
       }
-      
+
       // 为其他按钮添加点击事件监听器
       if (prevBtn) {
         prevBtn.addEventListener("click", () => this.playPrev());
       }
-      
+
       if (nextBtn) {
         nextBtn.addEventListener("click", () => this.playNext());
       }
-      
+
       if (muteBtn) {
         muteBtn.addEventListener("click", () => this.toggleMute());
       }
@@ -385,14 +397,14 @@ class Player {
       const settingsBtn = document.getElementById("settingsBtn");
       const closeSettingsBtn = document.getElementById("closeSettingsBtn");
       const settingsModal = document.getElementById("settingsModal");
-      
+
       if (settingsBtn && settingsModal) {
         settingsBtn.onclick = () => {
           // todo: 实现设置功能
           settingsModal.style.display = "flex";
         };
       }
-      
+
       if (closeSettingsBtn && settingsModal) {
         closeSettingsBtn.onclick = () => {
           settingsModal.style.display = "none";
@@ -403,38 +415,40 @@ class Player {
       const importBtn = document.getElementById("importBtn");
       const closeImportBtn = document.getElementById("closeImportBtn");
       const importModal = document.getElementById("importModal");
-      
+
       if (importBtn && importModal) {
         importBtn.onclick = () => {
           importModal.style.display = "flex";
-          
+
           // 确保首次打开时默认选中第一个标签页（本地导入）
-          const importTabs = document.querySelectorAll(".sidebar-item[data-tab]");
+          const importTabs = document.querySelectorAll(
+            ".sidebar-item[data-tab]"
+          );
           const importContents = document.querySelectorAll(".import-content");
-          
+
           // 移除所有标签页的活动状态
           importTabs.forEach((t) => t.classList.remove("active"));
           // 隐藏所有内容
           importContents.forEach((content) => {
             content.classList.remove("active");
-            content.style.display = 'none';
+            content.style.display = "none";
           });
 
           // 设置第一个标签页为活动状态
           if (importTabs.length > 0) {
             importTabs[0].classList.add("active");
-            
+
             // 显示第一个内容区域
             const firstTabId = importTabs[0].getAttribute("data-tab");
             const firstContentElement = document.getElementById(firstTabId);
             if (firstContentElement) {
-              firstContentElement.style.display = 'block';
+              firstContentElement.style.display = "block";
               firstContentElement.classList.add("active");
             }
           }
         };
       }
-      
+
       if (closeImportBtn && importModal) {
         closeImportBtn.onclick = () => {
           importModal.style.display = "none";
@@ -456,18 +470,18 @@ class Player {
 
           // 设置当前标签页为活动状态
           tab.classList.add("active");
-          
+
           // 显示相应的内容
           const tabId = tab.getAttribute("data-tab");
           // 先隐藏所有内容区域
-          document.querySelectorAll('.import-content').forEach(content => {
-            content.style.display = 'none';
+          document.querySelectorAll(".import-content").forEach((content) => {
+            content.style.display = "none";
           });
-          
+
           // 再显示对应的内容区域
           const contentElement = document.getElementById(tabId);
           if (contentElement) {
-            contentElement.style.display = 'block';
+            contentElement.style.display = "block";
             contentElement.classList.add("active");
           }
         });
@@ -589,7 +603,9 @@ class Player {
           const result = await response.json();
 
           if (result.success) {
-            const statusElement = uploadItem.querySelector(".upload-item-status");
+            const statusElement = uploadItem.querySelector(
+              ".upload-item-status"
+            );
             if (statusElement) {
               statusElement.textContent = "上传成功";
             }
@@ -617,10 +633,12 @@ class Player {
           const urlInput = document.getElementById("musicUrl");
           const titleInput = document.getElementById("musicTitle");
           const artistInput = document.getElementById("musicArtist");
-          
-          const url = urlInput ? urlInput.value.trim() : '';
-          const title = (titleInput ? titleInput.value.trim() : '') || "未命名音乐";
-          const artist = (artistInput ? artistInput.value.trim() : '') || "未知艺术家";
+
+          const url = urlInput ? urlInput.value.trim() : "";
+          const title =
+            (titleInput ? titleInput.value.trim() : "") || "未命名音乐";
+          const artist =
+            (artistInput ? artistInput.value.trim() : "") || "未知艺术家";
 
           if (!url) {
             alert("请输入音乐链接");
@@ -669,7 +687,7 @@ class Player {
       if (parseBiliBtn) {
         parseBiliBtn.addEventListener("click", async () => {
           const urlInput = document.getElementById("biliUrl");
-          const url = urlInput ? urlInput.value.trim() : '';
+          const url = urlInput ? urlInput.value.trim() : "";
 
           if (!url) {
             alert("请输入B站视频链接");
@@ -711,17 +729,20 @@ class Player {
                 if (importBiliBtn) {
                   importBiliBtn.addEventListener("click", async () => {
                     try {
-                      const importResponse = await fetch("/api/import_bilibili", {
-                        method: "POST",
-                        headers: {
-                          "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
-                          url: url,
-                          title: result.title,
-                          artist: result.uploader,
-                        }),
-                      });
+                      const importResponse = await fetch(
+                        "/api/import_bilibili",
+                        {
+                          method: "POST",
+                          headers: {
+                            "Content-Type": "application/json",
+                          },
+                          body: JSON.stringify({
+                            url: url,
+                            title: result.title,
+                            artist: result.uploader,
+                          }),
+                        }
+                      );
 
                       const importResult = await importResponse.json();
 
@@ -781,19 +802,20 @@ class Player {
         }
         // 播放/暂停图标切换已通过CSS类控制
       });
-      
+
       this.audio.addEventListener("ended", () => {
         // 更新播放按钮状态
         this.updatePlayButtonState("paused");
-        
+
         if (this.loopMode === 1) {
-          this.audio.play().catch(error => console.error("循环播放失败:", error));
-        }
-        else if (this.loopMode === 2) this.playNext();
+          this.audio
+            .play()
+            .catch((error) => console.error("循环播放失败:", error));
+        } else if (this.loopMode === 2) this.playNext();
         else if (this.loopMode === 3)
           this.playAt(Math.floor(Math.random() * this.playlist.length));
       });
-      
+
       this.audio.addEventListener("volumechange", () => {
         const volumeSlider = document.getElementById("volumeSlider");
         if (volumeSlider) {
@@ -819,14 +841,14 @@ class Player {
           }
         }
       });
-      
+
       // 初始化音量
       this.audio.volume = 1;
       const volSlider = document.getElementById("volumeSlider");
       if (volSlider) {
         volSlider.value = 1;
       }
-      
+
       console.log("事件监听器绑定完成");
     };
 
@@ -931,9 +953,11 @@ class Player {
 
         // 移除欢迎样式
         document.getElementById("welcomeContainer").style.display = "none";
-        
+
         // 使用checkbox控制播放状态
-        const playerStateCheckbox = document.getElementById("playerStateCheckbox");
+        const playerStateCheckbox = document.getElementById(
+          "playerStateCheckbox"
+        );
         if (playerStateCheckbox) {
           playerStateCheckbox.checked = true;
         }
@@ -972,18 +996,18 @@ class Player {
       // 获取播放列表
       const res = await fetch("/api/playlist");
       console.log("播放列表API响应:", res);
-      
+
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
-      
+
       const data = await res.json();
       console.log("播放列表数据:", data);
-      
+
       const { playlist } = data;
       this.playlist = playlist || [];
       console.log("处理后的播放列表:", this.playlist);
-      
+
       this.renderPlaylist();
 
       // 播放列表加载完成后，尝试恢复播放状态
@@ -998,7 +1022,7 @@ class Player {
     try {
       console.log("渲染播放列表，过滤条件:", filter);
       console.log("当前播放列表:", this.playlist);
-      
+
       const list = filter
         ? this.playlist.filter(
             (s) =>
@@ -1006,17 +1030,17 @@ class Player {
               s.artist.toLowerCase().includes(filter.toLowerCase())
           )
         : this.playlist;
-        
+
       console.log("过滤后的列表:", list);
-      
+
       const ul = document.getElementById("playlist");
       if (!ul) {
         console.error("无法找到播放列表元素");
         return;
       }
-      
+
       ul.innerHTML = "";
-      
+
       if (!list || list.length === 0) {
         console.log("播放列表为空");
         // 可以添加一个提示信息
@@ -1028,7 +1052,7 @@ class Player {
         ul.appendChild(emptyLi);
         return;
       }
-      
+
       list.forEach((item, idx) => {
         const li = document.createElement("li");
         li.className = idx === this.currentIndex ? "playing" : "";
@@ -1093,9 +1117,11 @@ class Player {
       this.hasPlayed = true;
       // 移除欢迎样式
       document.getElementById("welcomeContainer").style.display = "none";
-      
+
       // 使用checkbox控制播放状态
-      const playerStateCheckbox = document.getElementById("playerStateCheckbox");
+      const playerStateCheckbox = document.getElementById(
+        "playerStateCheckbox"
+      );
       if (playerStateCheckbox) {
         playerStateCheckbox.checked = true;
       }
@@ -1120,7 +1146,7 @@ class Player {
       // 更新播放按钮状态为播放中
       document.getElementById("playBtn").classList.remove("paused");
       document.getElementById("playBtn").classList.add("playing");
-      
+
       try {
         await this.audio.play();
       } catch (error) {
@@ -1129,10 +1155,10 @@ class Player {
         document.getElementById("playBtn").classList.remove("playing");
         document.getElementById("playBtn").classList.add("paused");
       }
-      
+
       // 歌词
       this.loadLyrics(item.filename);
-      
+
       // 设置媒体类型为音乐
       const mediaTypeCheckbox = document.getElementById("mediaTypeCheckbox");
       if (mediaTypeCheckbox) {
@@ -1154,7 +1180,7 @@ class Player {
 
       const player = document.getElementById("videoPlayer");
       player.src = `/media/video/${item.filename}`;
-      
+
       try {
         await player.play();
       } catch (error) {
@@ -1163,7 +1189,7 @@ class Player {
         document.getElementById("playBtn").classList.remove("playing");
         document.getElementById("playBtn").classList.add("paused");
       }
-      
+
       // 设置媒体类型为视频
       const mediaTypeCheckbox = document.getElementById("mediaTypeCheckbox");
       if (mediaTypeCheckbox) {
@@ -1316,14 +1342,14 @@ let playerInstance = null;
 
 document.addEventListener("DOMContentLoaded", () => {
   playerInstance = new Player();
-  playerInstance.loadPlaylist().catch(error => {
+  playerInstance.loadPlaylist().catch((error) => {
     console.error("初始化播放列表失败:", error);
   });
 });
 
 // 为全局访问提供接口
-Object.defineProperty(window, 'player', {
-  get: function() {
+Object.defineProperty(window, "player", {
+  get: function () {
     return playerInstance;
-  }
+  },
 });

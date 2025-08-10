@@ -49,6 +49,18 @@ class Player {
   }
 
   /**
+   * 更新播放按钮状态
+   * @param {string} state - 播放状态，'playing'或'paused'
+   */
+  updatePlayButtonState(state) {
+    const playBtn = document.getElementById("playBtn");
+    if (playBtn) {
+      playBtn.classList.remove("playing", "paused");
+      playBtn.classList.add(state);
+    }
+  }
+
+  /**
    * 切换循环播放模式
    * 循环模式包括: 无循环、单曲循环、列表循环、随机播放
    */
@@ -81,14 +93,18 @@ class Player {
 
   toggleMute() {
     this.audio.muted = !this.audio.muted;
-    // 使用类切换代替直接修改src
-    const muteBtn = document.getElementById("muteBtn");
-    if (this.audio.muted) {
-      muteBtn.classList.remove("unmuted");
-      muteBtn.classList.add("muted");
-    } else {
-      muteBtn.classList.remove("muted");
-      muteBtn.classList.add("unmuted");
+    // 更新音量图标
+    const volumeContainer = document.querySelector(".volume-container");
+    if (volumeContainer) {
+      // 移除音量状态类
+      volumeContainer.classList.remove("muted", "unmuted");
+
+      // 根据静音状态添加相应的类
+      if (this.audio.muted || this.audio.volume === 0) {
+        volumeContainer.classList.add("muted");
+      } else {
+        volumeContainer.classList.add("unmuted");
+      }
     }
   }
 
@@ -176,11 +192,7 @@ class Player {
             this.savePlayState();
             
             // 更新播放按钮状态
-            const playBtn = document.getElementById("playBtn");
-            if (playBtn) {
-              playBtn.classList.remove("playing");
-              playBtn.classList.add("paused");
-            }
+            this.updatePlayButtonState("paused");
           }
         });
 
@@ -195,11 +207,7 @@ class Player {
             this.savePlayState();
             
             // 更新播放按钮状态
-            const playBtn = document.getElementById("playBtn");
-            if (playBtn) {
-              playBtn.classList.remove("playing");
-              playBtn.classList.add("paused");
-            }
+            this.updatePlayButtonState("paused");
             
             // 处理视频循环播放
             if (this.loopMode === 1) {
@@ -776,11 +784,7 @@ class Player {
       
       this.audio.addEventListener("ended", () => {
         // 更新播放按钮状态
-        const playBtn = document.getElementById("playBtn");
-        if (playBtn) {
-          playBtn.classList.remove("playing");
-          playBtn.classList.add("paused");
-        }
+        this.updatePlayButtonState("paused");
         
         if (this.loopMode === 1) {
           this.audio.play().catch(error => console.error("循环播放失败:", error));
@@ -801,15 +805,17 @@ class Player {
           );
         }
 
-        // 使用类切换代替直接修改src
-        const muteBtn = document.getElementById("muteBtn");
-        if (muteBtn) {
+        // 更新音量图标
+        const volumeContainer = document.querySelector(".volume-container");
+        if (volumeContainer) {
+          // 移除音量状态类
+          volumeContainer.classList.remove("muted", "unmuted");
+
+          // 根据静音状态添加相应的类
           if (this.audio.muted || this.audio.volume === 0) {
-            muteBtn.classList.remove("unmuted");
-            muteBtn.classList.add("muted");
+            volumeContainer.classList.add("muted");
           } else {
-            muteBtn.classList.remove("muted");
-            muteBtn.classList.add("unmuted");
+            volumeContainer.classList.add("unmuted");
           }
         }
       });
@@ -1273,45 +1279,34 @@ class Player {
     const currentItem = this.playlist[this.currentIndex];
     if (!currentItem) return;
 
+    const playBtn = document.getElementById("playBtn");
+    let mediaElement, mediaType;
+
     if (currentItem.type === "music") {
-      if (this.audio.paused) {
-        try {
-          await this.audio.play();
-          // 使用类切换代替直接修改src
-          document.getElementById("playBtn").classList.remove("paused");
-          document.getElementById("playBtn").classList.add("playing");
-        } catch (error) {
-          console.error("播放音频时出错:", error);
-        }
-      } else {
-        this.audio.pause();
-        // 使用类切换代替直接修改src
-        document.getElementById("playBtn").classList.remove("playing");
-        document.getElementById("playBtn").classList.add("paused");
-
-        // 暂停时保存播放状态
-        this.savePlayState();
-      }
+      mediaElement = this.audio;
+      mediaType = "音频";
     } else if (currentItem.type === "video") {
-      const videoPlayer = document.getElementById("videoPlayer");
-      if (videoPlayer.paused) {
-        try {
-          await videoPlayer.play();
-          // 使用类切换代替直接修改src
-          document.getElementById("playBtn").classList.remove("paused");
-          document.getElementById("playBtn").classList.add("playing");
-        } catch (error) {
-          console.error("播放视频时出错:", error);
-        }
+      mediaElement = document.getElementById("videoPlayer");
+      mediaType = "视频";
+    }
+
+    if (!mediaElement) return;
+
+    try {
+      if (mediaElement.paused) {
+        await mediaElement.play();
+        // 更新播放按钮状态
+        this.updatePlayButtonState("playing");
       } else {
-        videoPlayer.pause();
-        // 使用类切换代替直接修改src
-        document.getElementById("playBtn").classList.remove("playing");
-        document.getElementById("playBtn").classList.add("paused");
+        mediaElement.pause();
+        // 更新播放按钮状态
+        this.updatePlayButtonState("paused");
 
         // 暂停时保存播放状态
         this.savePlayState();
       }
+    } catch (error) {
+      console.error(`播放${mediaType}时出错:`, error);
     }
   }
 }

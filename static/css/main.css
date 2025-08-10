@@ -236,16 +236,17 @@ button:hover {
 
 #loopBtn {
   width: auto;
-  padding: 0 12px 0 8px;
+  padding: 0 15px 0 10px;
   border-radius: 25px;
-  font-size: 14px;
+  font-size: 16px;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   color: black;
+  height: 50px;
 }
 #loopBtn i {
-  font-size: 16px;
+  font-size: 20px;
 }
 
 #loopText {
@@ -357,16 +358,10 @@ button:hover {
   transform: scale(1.2);
 }
 
-.volume-container.volume-mute #muteIcon::before {
+.volume-container.muted #muteIcon::before {
   content: "\f6a9";
 }
-.volume-container.volume-down #muteIcon::before {
-  content: "\f027";
-}
-.volume-container.volume #muteIcon::before {
-  content: "\f028";
-}
-.volume-container.volume-up #muteIcon::before {
+.volume-container.unmuted #muteIcon::before {
   content: "\f028";
 }
 
@@ -374,14 +369,6 @@ button:hover {
   content: "\f04c";
 }
 #playBtn.paused #playPauseIcon::before {
-  content: "\f04b";
-}
-
-.playing #playPauseIcon::before {
-  content: "\f04c";
-}
-
-.paused #playPauseIcon::before {
   content: "\f04b";
 }
 

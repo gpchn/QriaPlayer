@@ -136,7 +136,6 @@ QriaPlayer 依赖于以下主要 Python 库：
 
 - **bilibili-api-python** (>=17.3.0)：B 站 API 接口
 - **httpx** (>=0.28.1)：现代化的 HTTP 客户端
-- **pillow** (>=11.2.1)：Python 图像处理库
 - **pyffmpeg** (>=2.4.3)：Python 的 FFmpeg 封装
 - **pystray** (>=0.19.5)：系统托盘支持
 - **pywebview** (>=5.4)：将 Web 内容嵌入到桌面应用

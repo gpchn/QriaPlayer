@@ -464,9 +464,6 @@ name = "pyffmpeg"
 version = "2.4.3"
 source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple/" }
 wheels = [
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/87/63/cbbd76fcc0ed2d61ea1b5b1eeaee7d73c769acf9423498ebee2f4dfd416d/pyffmpeg-2.4.3-py3-none-macosx_10_9_universal2.whl", hash = "sha256:0f0675462db89ab8779172b74095fd38ce92c5948fe4df40d62bb090521e7153", size = 17511676 },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/5a/61/f1610debc4dd6172154d07819966c4e7748a71ec80cba5a3b2f7d1c3534b/pyffmpeg-2.4.3-py3-none-macosx_10_9_x86_64.whl", hash = "sha256:5cce89e7198c9ff5c4fa81735c6ab8b96a632f23a3b926c4b726a6d375c38861", size = 17511676 },
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/5d/bd/b08140d5c46a9afa5ce9d1cba674763c3c942879ac7efe4e15644f10d0d7/pyffmpeg-2.4.3-py3-none-macosx_11_0_arm64.whl", hash = "sha256:5b827aafbd83f9bd71b18ca7e95d3af04fc3e71e7b43606757c0bc20a33dbfe4", size = 17511676 },
     { url = "https://pypi.tuna.tsinghua.edu.cn/packages/46/bd/808bb724edcce8dab6b41aa0df75ed69300c287bb9b288b1f1de23296d1b/pyffmpeg-2.4.3-py3-none-win32.whl", hash = "sha256:ff27a2269c2d5378074317118336137a3dd66017590721644afc788ef7a0e391", size = 41008995 },
     { url = "https://pypi.tuna.tsinghua.edu.cn/packages/5d/6d/631766d3fef705ce093df66488caabb3caf842611f3a91707313cf8b7a6a/pyffmpeg-2.4.3-py3-none-win_amd64.whl", hash = "sha256:98a36ce810ea8c84aee5e4bbb4c4c27c079db4aecdf914e0043cf5cfcecc9fcd", size = 41008995 },
 ]
@@ -669,28 +666,31 @@ sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/96/62/2422c088b7219d
 
 [[package]]
 name = "qriaplayer"
-version = "2.0.0"
+version = "2.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "bilibili-api-python" },
     { name = "httpx" },
-    { name = "pillow" },
-    { name = "pyffmpeg" },
     { name = "pystray" },
     { name = "pywebview" },
     { name = "waitress" },
+]
+
+[package.optional-dependencies]
+merge = [
+    { name = "pyffmpeg", marker = "sys_platform == 'win32'" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "bilibili-api-python", specifier = ">=17.3.0" },
     { name = "httpx", specifier = ">=0.28.1" },
-    { name = "pillow", specifier = ">=11.2.1" },
-    { name = "pyffmpeg", specifier = ">=2.4.3" },
+    { name = "pyffmpeg", marker = "sys_platform == 'win32' and extra == 'merge'", specifier = ">=2.4.3" },
     { name = "pystray", specifier = ">=0.19.5" },
     { name = "pywebview", specifier = ">=5.4" },
     { name = "waitress", specifier = ">=3.0.2" },
 ]
+provides-extras = ["merge"]
 
 [[package]]
 name = "qtpy"

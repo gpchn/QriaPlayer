@@ -7,11 +7,14 @@ requires-python = ">=3.12"
 dependencies = [
     "bilibili-api-python>=17.3.0",
     "httpx>=0.28.1",
-    "pillow>=11.2.1",
-    "pyffmpeg>=2.4.3",
     "pystray>=0.19.5",
     "pywebview>=5.4",
     "waitress>=3.0.2",
+]
+
+[project.optional-dependencies]
+merge = [
+    "pyffmpeg>=2.4.3; platform_system=='Windows'",
 ]
 
 [[tool.uv.index]]

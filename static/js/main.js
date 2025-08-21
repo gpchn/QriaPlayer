@@ -20,7 +20,7 @@ class Player {
       const state = await $.ajax({
         url: "/api/play_state",
         method: "GET",
-        dataType: "json"
+        dataType: "json",
       });
 
       console.log("获取到保存的状态:", state);
@@ -79,7 +79,7 @@ class Player {
           url: "/api/play_state",
           method: "POST",
           contentType: "application/json",
-          data: JSON.stringify(state)
+          data: JSON.stringify(state),
         });
       } catch (err) {
         console.error("保存播放状态失败:", err);
@@ -117,8 +117,8 @@ class Player {
             // 总是暂停在恢复的位置，不自动播放
             this.audio.pause();
             $("#playPauseIcon").attr({
-              "src": "/static/icons/play.svg",
-              "alt": "播放"
+              src: "/static/icons/play.svg",
+              alt: "播放",
             });
           } else if (mediaType === "video") {
             // 设置视频播放进度
@@ -137,7 +137,7 @@ class Player {
     const data = await $.ajax({
       url: "/api/playlist",
       method: "GET",
-      dataType: "json"
+      dataType: "json",
     });
     this.playlist = data.playlist;
     this.renderPlaylist();
@@ -162,10 +162,12 @@ class Player {
         .addClass(idx === this.currentIndex ? "playing" : "")
         // 区分视频和音频
         .toggleClass("video-item", item.type === "video")
-        .html(`
+        .html(
+          `
           <div class="song-name">${item.title}</div>
           <div class="song-artist">${item.artist}</div>
-        `)
+        `
+        )
         .on("click", () => this.playAt(this.playlist.indexOf(item)));
       $ul.append($li);
     });
@@ -246,7 +248,58 @@ class Player {
 
       const $player = $("#videoPlayer");
       $player.attr("src", `/media/video/${item.filename}`);
-      $player[0].play();
+      
+      // 初始化视频控件状态
+      const $videoProgressBar = $("#videoProgressBar");
+      $videoProgressBar.val(0);
+      $("#videoCurrentTime").text("0:00");
+      $("#videoDuration").text("0:00");
+      
+      // 同步循环模式状态到视频播放器
+      const videoPlayer = $player[0];
+      videoPlayer.loop = this.loopMode === 1;
+      
+      const txts = ["关", "单曲", "全部", "随机"];
+      const icons = [
+        "/static/icons/loop-off.svg",
+        "/static/icons/loop-one.svg",
+        "/static/icons/loop-list.svg",
+        "/static/icons/loop-random.svg",
+      ];
+      
+      $("#videoLoopText").text(txts[this.loopMode]);
+      $("#videoLoopIcon").attr({
+        src: icons[this.loopMode],
+        alt: "循环" + txts[this.loopMode],
+      });
+      
+      // 设置音量
+      videoPlayer.volume = this.audio.volume;
+      videoPlayer.muted = this.audio.muted;
+      
+      // 更新音量滑块状态
+      $("#videoVolumeSlider").val(videoPlayer.muted ? 0 : videoPlayer.volume);
+      $("#videoVolumeSlider").css("--volume-percent", (videoPlayer.muted ? 0 : videoPlayer.volume) * 100 + "%");
+      
+      // 更新静音按钮图标
+      if (videoPlayer.muted || videoPlayer.volume === 0) {
+        $("#videoMuteIcon").attr({
+          src: "/static/icons/mute.svg",
+          alt: "静音",
+        });
+      } else {
+        $("#videoMuteIcon").attr({
+          src: "/static/icons/volume.svg",
+          alt: "音量",
+        });
+      }
+      
+      // 播放视频并更新播放按钮图标
+      videoPlayer.play();
+      $("#videoPlayPauseIcon").attr({
+        src: "/static/icons/pause.svg",
+        alt: "暂停",
+      });
     } else {
       console.error("未知媒体类型:", item.type);
       return;
@@ -269,7 +322,7 @@ class Player {
       const data = await $.ajax({
         url: `/api/get_lrc/${filename.replace(".mp3", ".lrc")}`,
         method: "GET",
-        dataType: "json"
+        dataType: "json",
       });
       this.lyrics = this.parseLyrics(data.lyrics);
     } catch {
@@ -311,12 +364,16 @@ class Player {
     if (idx === -1 && currentTime >= this.lyrics[this.lyrics.length - 1].time) {
       idx = this.lyrics.length - 1;
     }
-    $box.html(this.lyrics
-      .map(
-        (l, i) =>
-          `<div class="${i === idx ? "lyrics-highlight" : ""}">${l.text}</div>`
-      )
-      .join(""));
+    $box.html(
+      this.lyrics
+        .map(
+          (l, i) =>
+            `<div class="${i === idx ? "lyrics-highlight" : ""}">${
+              l.text
+            }</div>`
+        )
+        .join("")
+    );
     // 歌词垂直居中：将当前歌词的中心与歌词框的中心对齐
     // 只有当用户没有正在滚动歌词时才自动滚动
     if (idx !== -1 && !this.isUserScrollingLyrics) {
@@ -358,13 +415,13 @@ class Player {
       this.audio.play();
       $("#playPauseIcon").attr({
         src: "/static/icons/pause.svg",
-        alt: "暂停"
+        alt: "暂停",
       });
     } else {
       this.audio.pause();
       $("#playPauseIcon").attr({
         src: "/static/icons/play.svg",
-        alt: "播放"
+        alt: "播放",
       });
 
       // 暂停时保存播放状态
@@ -385,7 +442,7 @@ class Player {
     $("#loopText").text(txts[this.loopMode]);
     $("#loopIcon").attr({
       src: icons[this.loopMode],
-      alt: "循环" + txts[this.loopMode]
+      alt: "循环" + txts[this.loopMode],
     });
   }
 
@@ -395,12 +452,12 @@ class Player {
     if (this.audio.muted) {
       $muteIcon.attr({
         src: "/static/icons/mute.svg",
-        alt: "静音"
+        alt: "静音",
       });
     } else {
       $muteIcon.attr({
         src: "/static/icons/volume.svg",
-        alt: "音量"
+        alt: "音量",
       });
     }
   }
@@ -423,6 +480,122 @@ class Player {
     const s = Math.floor(sec % 60);
     return `${m}:${s.toString().padStart(2, "0")}`;
   }
+  
+  // 视频播放器控制方法
+  toggleVideoPlay() {
+    const $videoPlayer = $("#videoPlayer")[0];
+    if ($videoPlayer.paused) {
+      $videoPlayer.play();
+      $("#videoPlayPauseIcon").attr({
+        src: "/static/icons/pause.svg",
+        alt: "暂停",
+      });
+    } else {
+      $videoPlayer.pause();
+      $("#videoPlayPauseIcon").attr({
+        src: "/static/icons/play.svg",
+        alt: "播放",
+      });
+      
+      // 暂停时保存播放状态
+      this.savePlayState();
+    }
+  }
+
+  toggleVideoLoopMode() {
+    this.loopMode = (this.loopMode + 1) % 4;
+    const $videoPlayer = $("#videoPlayer")[0];
+    $videoPlayer.loop = this.loopMode === 1;
+    
+    const txts = ["关", "单曲", "全部", "随机"];
+    const icons = [
+      "/static/icons/loop-off.svg",
+      "/static/icons/loop-one.svg",
+      "/static/icons/loop-list.svg",
+      "/static/icons/loop-random.svg",
+    ];
+    
+    $("#videoLoopText").text(txts[this.loopMode]);
+    $("#videoLoopIcon").attr({
+      src: icons[this.loopMode],
+      alt: "循环" + txts[this.loopMode],
+    });
+    
+    // 同时更新音频播放器的循环模式
+    this.audio.loop = this.loopMode === 1;
+    $("#loopText").text(txts[this.loopMode]);
+    $("#loopIcon").attr({
+      src: icons[this.loopMode],
+      alt: "循环" + txts[this.loopMode],
+    });
+  }
+
+  toggleVideoMute() {
+    const $videoPlayer = $("#videoPlayer")[0];
+    $videoPlayer.muted = !$videoPlayer.muted;
+    
+    const $videoMuteIcon = $("#videoMuteIcon");
+    if ($videoPlayer.muted) {
+      $videoMuteIcon.attr({
+        src: "/static/icons/mute.svg",
+        alt: "静音",
+      });
+    } else {
+      $videoMuteIcon.attr({
+        src: "/static/icons/volume.svg",
+        alt: "音量",
+      });
+    }
+  }
+
+  setVideoVolume(val) {
+    const $videoPlayer = $("#videoPlayer")[0];
+    $videoPlayer.volume = val;
+    $videoPlayer.muted = val === 0;
+    
+    // 更新滑块颜色
+    $("#videoVolumeSlider").css("--volume-percent", val * 100 + "%");
+  }
+
+  seekVideo(val) {
+    const $videoPlayer = $("#videoPlayer")[0];
+    if (!isNaN($videoPlayer.duration)) {
+      $videoPlayer.currentTime = $videoPlayer.duration * (val / 100);
+    }
+  }
+
+  toggleVideoFullscreen() {
+    const container = document.getElementById("videoPlayerContainer");
+    if (!document.fullscreenElement) {
+      // 进入全屏
+      if (container.requestFullscreen) {
+        container.requestFullscreen();
+      } else if (container.webkitRequestFullscreen) { /* Safari */
+        container.webkitRequestFullscreen();
+      } else if (container.msRequestFullscreen) { /* IE11 */
+        container.msRequestFullscreen();
+      }
+      $("#videoFullscreenIcon").attr({
+        src: "/static/icons/fullscreen-exit.svg",
+        alt: "退出全屏",
+      });
+      $(container).addClass("fullscreen");
+    } else {
+      // 退出全屏
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) { /* Safari */
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) { /* IE11 */
+        document.msExitFullscreen();
+      }
+      $("#videoFullscreenIcon").attr({
+        src: "/static/icons/fullscreen.svg",
+        alt: "全屏",
+      });
+      $(container).removeClass("fullscreen");
+    }
+  }
 
   initEvents() {
     // 定期保存播放状态（每 30 秒）
@@ -440,6 +613,48 @@ class Player {
     // 为视频播放器添加事件监听
     const $videoPlayer = $("#videoPlayer");
 
+    // 视频播放器控件事件
+    $("#videoPlayBtn").on("click", () => this.toggleVideoPlay());
+    $("#videoPrevBtn").on("click", () => this.playPrev());
+    $("#videoNextBtn").on("click", () => this.playNext());
+    $("#videoLoopBtn").on("click", () => this.toggleVideoLoopMode());
+    $("#videoMuteBtn").on("click", () => this.toggleVideoMute());
+    $("#videoFullscreenBtn").on("click", () => this.toggleVideoFullscreen());
+
+    // 视频进度条
+    $("#videoProgressBar").on("input", (e) => {
+      this.seekVideo($(e.target).val());
+    });
+
+    // 视频音量
+    const $videoVolumeSlider = $("#videoVolumeSlider");
+    $videoVolumeSlider.on("input", (e) => {
+      const value = $(e.target).val();
+      this.setVideoVolume(value);
+      // 更新滑块颜色
+      $videoVolumeSlider.css("--volume-percent", value * 100 + "%");
+    });
+    // 初始设置滑块颜色
+    $videoVolumeSlider.css("--volume-percent", "100%");
+
+    // 视频时间更新
+    $videoPlayer.on("timeupdate", () => {
+      const player = $videoPlayer[0];
+      const cur = player.currentTime;
+      const dur = player.duration;
+
+      const $progressBar = $("#videoProgressBar");
+      $progressBar.val((cur / dur) * 100 || 0);
+      $("#videoCurrentTime").text(this.formatTime(cur));
+      $("#videoDuration").text(this.formatTime(dur));
+    });
+
+    // 视频加载元数据时（获取到视频时长等信息）
+    $videoPlayer.on("loadedmetadata", () => {
+      const player = $videoPlayer[0];
+      $("#videoDuration").text(this.formatTime(player.duration));
+    });
+
     // 视频暂停时保存状态
     $videoPlayer.on("pause", () => {
       if (
@@ -448,6 +663,25 @@ class Player {
       ) {
         console.log("视频暂停，保存播放状态");
         this.savePlayState();
+        // 更新播放/暂停按钮图标
+        $("#videoPlayPauseIcon").attr({
+          src: "/static/icons/play.svg",
+          alt: "播放",
+        });
+      }
+    });
+
+    // 视频播放时
+    $videoPlayer.on("play", () => {
+      if (
+        this.currentIndex !== -1 &&
+        this.playlist[this.currentIndex].type === "video"
+      ) {
+        // 更新播放/暂停按钮图标
+        $("#videoPlayPauseIcon").attr({
+          src: "/static/icons/pause.svg",
+          alt: "暂停",
+        });
       }
     });
 
@@ -459,6 +693,40 @@ class Player {
       ) {
         console.log("视频结束，保存播放状态");
         this.savePlayState();
+        
+        // 根据循环模式处理
+        if (this.loopMode === 1) {
+          // 单曲循环
+          $videoPlayer[0].play();
+        } else if (this.loopMode === 2) {
+          // 列表循环
+          this.playNext();
+        } else if (this.loopMode === 3) {
+          // 随机播放
+          this.playAt(Math.floor(Math.random() * this.playlist.length));
+        }
+      }
+    });
+    
+    // 视频音量变化
+    $videoPlayer.on("volumechange", () => {
+      const player = $videoPlayer[0];
+      const $videoVolumeSlider = $("#videoVolumeSlider");
+      $videoVolumeSlider.val(player.muted ? 0 : player.volume);
+      // 更新滑块颜色
+      $videoVolumeSlider.css("--volume-percent", (player.muted ? 0 : player.volume) * 100 + "%");
+
+      const $videoMuteIcon = $("#videoMuteIcon");
+      if (player.muted || player.volume === 0) {
+        $videoMuteIcon.attr({
+          src: "/static/icons/mute.svg",
+          alt: "静音",
+        });
+      } else {
+        $videoMuteIcon.attr({
+          src: "/static/icons/volume.svg",
+          alt: "音量",
+        });
       }
     });
 
@@ -508,11 +776,11 @@ class Player {
       const rect = $playlistContainer[0].getBoundingClientRect();
       $scrollTopBtn.css({
         right: $(window).width() - rect.right + 16 + "px",
-        bottom: $(window).height() - rect.bottom + 24 + "px"
+        bottom: $(window).height() - rect.bottom + 24 + "px",
       });
       $scrollToPlayingBtn.css({
         right: $(window).width() - rect.right + 16 + "px",
-        bottom: $(window).height() - rect.bottom + 76 + "px" // 在顶部按钮上方
+        bottom: $(window).height() - rect.bottom + 76 + "px", // 在顶部按钮上方
       });
     }
 
@@ -539,9 +807,17 @@ class Player {
     $scrollToPlayingBtn.on("click", () => {
       const $playingElement = $("#playlist li.playing");
       if ($playingElement.length) {
-        $playlistContainer.animate({
-          scrollTop: $playingElement.offset().top - $playlistContainer.offset().top + $playlistContainer.scrollTop() - ($playlistContainer.height() / 2) + ($playingElement.height() / 2)
-        }, 300);
+        $playlistContainer.animate(
+          {
+            scrollTop:
+              $playingElement.offset().top -
+              $playlistContainer.offset().top +
+              $playlistContainer.scrollTop() -
+              $playlistContainer.height() / 2 +
+              $playingElement.height() / 2,
+          },
+          300
+        );
       }
     });
     // 进度条
@@ -590,7 +866,7 @@ class Player {
     const $importTabs = $(".sidebar-item[data-tab]");
     const $importContents = $(".import-content");
 
-    $importTabs.on("click", function() {
+    $importTabs.on("click", function () {
       // 移除所有标签页的活动状态
       $importTabs.removeClass("active");
       // 隐藏所有内容
@@ -625,15 +901,15 @@ class Player {
       e.preventDefault();
       e.stopPropagation();
     }
-    
+
     $dropzone.on("dragenter dragover dragleave drop", preventDefaults);
 
     // 拖放区域高亮
-    $dropzone.on("dragenter dragover", function() {
+    $dropzone.on("dragenter dragover", function () {
       $(this).addClass("active");
     });
 
-    $dropzone.on("dragleave drop", function() {
+    $dropzone.on("dragleave drop", function () {
       $(this).removeClass("active");
     });
 
@@ -685,7 +961,7 @@ class Player {
           method: "POST",
           data: formData,
           processData: false,
-          contentType: false
+          contentType: false,
         });
 
         if (response.success) {
@@ -697,7 +973,8 @@ class Player {
         }
       } catch (error) {
         console.error("上传失败:", error);
-        $uploadItem.find(".upload-item-status")
+        $uploadItem
+          .find(".upload-item-status")
           .text("上传失败")
           .addClass("upload-item-error");
       }
@@ -722,7 +999,7 @@ class Player {
           url: "/api/import_url",
           method: "POST",
           contentType: "application/json",
-          data: JSON.stringify({ url, title, artist })
+          data: JSON.stringify({ url, title, artist }),
         });
 
         if (result.success) {
@@ -759,7 +1036,7 @@ class Player {
           url: "/api/parse_bilibili",
           method: "POST",
           contentType: "application/json",
-          data: JSON.stringify({ url })
+          data: JSON.stringify({ url }),
         });
 
         if (result.success) {
@@ -787,7 +1064,7 @@ class Player {
                   url: url,
                   title: result.title,
                   artist: result.uploader,
-                })
+                }),
               });
 
               if (importResult.success) {
@@ -821,7 +1098,10 @@ class Player {
         dur = this.audio.duration;
       const $bar = $("#progressBar");
       $bar.val((cur / dur) * 100 || 0);
-      $bar.css("background", `linear-gradient(to right, #2e7d32 0%, #2e7d32 ${$bar.val()}%, #555 ${$bar.val()}%, #555 100%)`);
+      $bar.css(
+        "background",
+        `linear-gradient(to right, #2e7d32 0%, #2e7d32 ${$bar.val()}%, #555 ${$bar.val()}%, #555 100%)`
+      );
       $("#currentTime").text(this.formatTime(cur));
       $("#duration").text(this.formatTime(dur));
       this.updateLyrics(cur);
@@ -835,12 +1115,12 @@ class Player {
       if (this.audio.paused) {
         $playPauseIcon.attr({
           src: "/static/icons/play.svg",
-          alt: "播放"
+          alt: "播放",
         });
       } else {
         $playPauseIcon.attr({
           src: "/static/icons/pause.svg",
-          alt: "暂停"
+          alt: "暂停",
         });
       }
     });
@@ -860,12 +1140,12 @@ class Player {
       if (this.audio.muted || this.audio.volume === 0) {
         $muteIcon.attr({
           src: "/static/icons/mute.svg",
-          alt: "静音"
+          alt: "静音",
         });
       } else {
         $muteIcon.attr({
           src: "/static/icons/volume.svg",
-          alt: "音量"
+          alt: "音量",
         });
       }
     });

@@ -55,19 +55,20 @@ class PlayState:
 
 
 # 初始化项目目录结构
-home = Path(__file__).parent  # 项目根目录
+home = Path(__file__).parent.parent  # 项目根目录
 static = home / "static"  # 静态资源目录
-musics = home / "musics"  # 音乐文件目录
+data = home / "data"  # 数据储存目录
+data.mkdir(exist_ok=True)  # 确保数据目录存在
+musics = data / "musics"  # 音乐文件目录
 musics.mkdir(exist_ok=True)  # 确保音乐目录存在
 music_list = [f.name for f in musics.glob("*.mp3")]  # 扫描所有MP3文件
-lyrics = home / "lyrics"  # 歌词文件目录
+lyrics = data / "lyrics"  # 歌词文件目录
 lyrics.mkdir(exist_ok=True)  # 确保歌词目录存在
-videos = home / "videos"  # 视频文件目录
+videos = data / "videos"  # 视频文件目录
 videos.mkdir(exist_ok=True)  # 确保视频目录存在
 video_list = [f.name for f in videos.glob("*.mp4")]  # 扫描所有MP4文件
-
 # 播放状态存储
-state_file = home / "player_state.json"
+state_file = data / "player_state.json"
 play_state = PlayState()  # 默认播放状态
 
 # 如果状态文件存在，加载之前的播放状态
